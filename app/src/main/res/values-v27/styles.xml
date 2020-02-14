@@ -23,6 +23,13 @@
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowLightStatusBar">true</item>
+    </style>
 
+    <style name="CampGladiator.Dark">
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorBackground">@color/backgroundDark</item>
+        <item name="colorOnBackground">#212121</item>
     </style>
 </resources>

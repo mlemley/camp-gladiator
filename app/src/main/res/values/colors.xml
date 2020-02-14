@@ -6,6 +6,7 @@
     <color name="colorTextPrimary">#969696</color>
     <color name="colorDisplayText">#263746</color>
     <color name="background">#FAFAFA</color>
+    <color name="backgroundDark">#263746</color>
 
     <color name="colorWelcomeOverlayFill">#f0263746</color>
 </resources>

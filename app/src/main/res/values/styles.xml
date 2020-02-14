@@ -25,4 +25,10 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
+    <style name="CampGladiator.Dark">
+        <item name="android:statusBarColor">@null</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
 </resources>
