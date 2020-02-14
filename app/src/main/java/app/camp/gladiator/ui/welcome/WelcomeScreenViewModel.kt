@@ -19,7 +19,7 @@ class WelcomeScreenViewModel(
     }
 
     sealed class RequiredActions {
-        object proceedForward
+        object ProceedForward: RequiredActions()
     }
 
     data class WelcomeScreenState(
