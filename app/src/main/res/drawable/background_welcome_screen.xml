@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/background_welcome_layer_2" />
+    <item android:drawable="@drawable/background_welcome_layer_1"
+        android:gravity="clip_horizontal|clip_vertical"
+        />
+</layer-list>
