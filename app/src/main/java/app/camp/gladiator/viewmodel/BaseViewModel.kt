@@ -1,6 +1,5 @@
 package app.camp.gladiator.viewmodel
 
-import com.crashlytics.android.Crashlytics
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
@@ -17,7 +16,7 @@ interface Result
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-abstract class BaseViewModel<E:Event, S: State> : ViewModel() {
+abstract class BaseViewModel<E : Event, S : State> : ViewModel() {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var events: Channel<E> = Channel(Channel.UNLIMITED)
@@ -41,7 +40,7 @@ abstract class BaseViewModel<E:Event, S: State> : ViewModel() {
             }
             .distinctUntilChanged()
             .catch {
-                Crashlytics.logException(it)
+                //Crashlytics.logException(it) -- bubble up to crashlytics or other error reporting utility
                 Log.e("BaseModelView", it.localizedMessage)
                 it.printStackTrace()
             }

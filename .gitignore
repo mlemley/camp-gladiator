@@ -8,3 +8,4 @@
 .externalNativeBuild
 .cxx
 *.swp
+app/google-services.json
