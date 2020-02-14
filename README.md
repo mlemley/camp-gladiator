@@ -1,4 +1,4 @@
-# camp-gladiator [Build Status](https://travis-ci.org/mlemley/camp-gladiator.svg?branch=master)
+# camp-gladiator ![Build Status](https://travis-ci.org/mlemley/camp-gladiator.svg?branch=master)
 
 ## Dev Setup
 
