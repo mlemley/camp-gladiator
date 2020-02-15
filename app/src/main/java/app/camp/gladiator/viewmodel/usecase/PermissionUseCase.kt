@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOn
 
+@ExperimentalCoroutinesApi
 class PermissionUseCase : UseCase {
     data class PermissionResponseReceived(val permissions: Map<String, Int>) : Action
     sealed class Results : Result {
@@ -29,7 +30,6 @@ class PermissionUseCase : UseCase {
         }
     }
 
-    @ExperimentalCoroutinesApi
     private fun handlePermissionResponseReceived(permissions: Map<String, Int>): Flow<Result> =
         channelFlow<Result> {
             permissions.forEach { (permissionName, result) ->

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.location.Location
 import app.camp.gladiator.client.cg.model.TrainingLocation
 import app.camp.gladiator.extensions.exhaustive
+import app.camp.gladiator.ui.welcome.WelcomeScreenViewModel
 import app.camp.gladiator.util.Permission
 import app.camp.gladiator.util.PermissionUtil
 import app.camp.gladiator.viewmodel.*
@@ -34,7 +35,7 @@ class LocationsViewModel(
         val userLocation: Location? = null
     ) : State
 
-    override val useCases: List<UseCase> = emptyList()
+    override val useCases: List<UseCase> = listOf(permissionUseCase)
 
     override fun makeInitState(): LocationsState = LocationsState(
         requiredPermission = requiredPermission(),
@@ -45,13 +46,14 @@ class LocationsViewModel(
         collect {
             when (it) {
                 is Events.GatherLocationsNearMe -> TODO()
-                is Events.PermissionsResponse -> TODO() // Action should Trigger permission check
+                is Events.PermissionsResponse -> emit(PermissionUseCase.PermissionResponseReceived(it.permissions))
             }.exhaustive
         }
     }
 
     override fun LocationsState.plus(result: Result): LocationsState {
         return when (result) {
+            is PermissionUseCase.Results.LocationPermissionGranted -> copy(requiredPermission = null)
             else -> this
         }
     }
