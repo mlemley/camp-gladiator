@@ -1,7 +1,7 @@
 package app.camp.gladiator.viewmodel.usecase
 
 import android.content.pm.PackageManager
-import app.camp.gladiator.util.Permission
+import app.camp.gladiator.repository.Permission
 import app.camp.gladiator.viewmodel.Action
 import app.camp.gladiator.viewmodel.usecase.PermissionUseCase.Results
 import com.google.common.truth.Truth.assertThat

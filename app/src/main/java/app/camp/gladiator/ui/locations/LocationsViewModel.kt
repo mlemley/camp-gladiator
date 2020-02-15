@@ -1,12 +1,10 @@
 package app.camp.gladiator.ui.locations
 
-import android.app.Activity
 import android.location.Location
 import app.camp.gladiator.client.cg.model.TrainingLocation
 import app.camp.gladiator.extensions.exhaustive
-import app.camp.gladiator.ui.welcome.WelcomeScreenViewModel
-import app.camp.gladiator.util.Permission
-import app.camp.gladiator.util.PermissionUtil
+import app.camp.gladiator.repository.Permission
+import app.camp.gladiator.repository.PermissionRepository
 import app.camp.gladiator.viewmodel.*
 import app.camp.gladiator.viewmodel.usecase.PermissionUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,7 +16,7 @@ import kotlinx.coroutines.flow.flow
 @FlowPreview
 @ExperimentalCoroutinesApi
 class LocationsViewModel(
-    val permissionUtil: PermissionUtil,
+    val permissionRepository: PermissionRepository,
     val permissionRationale: String,
     permissionUseCase: PermissionUseCase
 ) :
@@ -59,7 +57,7 @@ class LocationsViewModel(
     }
 
     private fun requiredPermission(): Permission? {
-        return if (permissionUtil.hasPermissionFor(Permission.LocationPermission())) null
+        return if (permissionRepository.hasPermissionFor(Permission.LocationPermission())) null
         else Permission.LocationPermission()
     }
 

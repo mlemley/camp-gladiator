@@ -1,4 +1,4 @@
-package app.camp.gladiator.util
+package app.camp.gladiator.repository
 
 import android.Manifest
 import android.content.Context
@@ -17,7 +17,7 @@ sealed class Permission: IPermission {
     ) : Permission()
 }
 
-class PermissionUtil constructor(private val context: Context) {
+class PermissionRepository constructor(private val context: Context) {
 
     fun hasPermissionFor(permission: Permission): Boolean {
         return ContextCompat.checkSelfPermission(context, permission.name) == PackageManager.PERMISSION_GRANTED

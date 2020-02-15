@@ -1,9 +1,12 @@
 package app.camp.gladiator.ui.app.di
 
 import app.camp.gladiator.R
+import app.camp.gladiator.extensions.app.locationManager
+import app.camp.gladiator.extensions.app.locationServices
+import app.camp.gladiator.repository.LocationRepository
+import app.camp.gladiator.repository.PermissionRepository
 import app.camp.gladiator.ui.locations.LocationsViewModel
 import app.camp.gladiator.ui.welcome.WelcomeScreenViewModel
-import app.camp.gladiator.util.PermissionUtil
 import app.camp.gladiator.viewmodel.usecase.DelayedCallback
 import app.camp.gladiator.viewmodel.usecase.PermissionUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,8 +23,13 @@ val appModule = module {
     single(named("WelcomeScreenDelay")) { 700L }
     single(named("LocationPermissionRationale")) { androidContext().getString(R.string.permission_rationale) }
 
+    // Android System Services
+    factory { androidContext().locationServices }
+    factory { androidContext().locationManager }
+
     // Util
-    single { PermissionUtil(androidContext()) }
+    single { PermissionRepository(androidContext()) }
+    factory { LocationRepository(get(), get()) }
 
     // UseCases
     factory { DelayedCallback() }

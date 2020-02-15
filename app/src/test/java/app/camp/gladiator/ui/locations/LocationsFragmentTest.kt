@@ -2,12 +2,10 @@ package app.camp.gladiator.ui.locations
 
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.lifecycle.LiveData
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.camp.gladiator.app.Helpers.denyPermissions
 import app.camp.gladiator.app.Helpers.loadModules
-import app.camp.gladiator.app.TestCampGladiatorApplication
-import app.camp.gladiator.util.Permission
+import app.camp.gladiator.repository.Permission
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
@@ -59,7 +57,8 @@ class LocationsFragmentTest {
         }
         createScenario(locationsViewModel = viewModel).onFragment { fragment ->
             fragment.stateObserver.onChanged(
-                LocationsViewModel.LocationsState())
+                LocationsViewModel.LocationsState()
+            )
 
             verify {
                 viewModel.dispatchEvent(LocationsViewModel.Events.GatherLocationsNearMe)

@@ -1,9 +1,9 @@
 package app.camp.gladiator.ui.locations
 
 import android.content.pm.PackageManager
+import app.camp.gladiator.repository.Permission
+import app.camp.gladiator.repository.PermissionRepository
 import app.camp.gladiator.ui.locations.LocationsViewModel.LocationsState
-import app.camp.gladiator.util.Permission
-import app.camp.gladiator.util.PermissionUtil
 import app.camp.gladiator.viewmodel.Action
 import app.camp.gladiator.viewmodel.usecase.PermissionUseCase
 import com.google.common.truth.Truth.assertThat
@@ -25,12 +25,12 @@ class LocationsViewModelTest {
     }
 
     private fun createViewModel(
-        permissionUtil: PermissionUtil = mockk(relaxUnitFun = true) {
+        permissionRepository: PermissionRepository = mockk(relaxUnitFun = true) {
             every { hasPermissionFor(Permission.LocationPermission()) } returns true
         },
         permissionUseCase: PermissionUseCase = mockk(relaxUnitFun = true)
     ): LocationsViewModel = LocationsViewModel(
-        permissionUtil,
+        permissionRepository,
         permissionRationale,
         permissionUseCase
     )
@@ -39,7 +39,7 @@ class LocationsViewModelTest {
     fun make_init_state__require_location_permission() {
         assertThat(
             createViewModel(
-                permissionUtil = mockk {
+                permissionRepository = mockk {
                     every { hasPermissionFor(Permission.LocationPermission()) } returns false
                 }
             ).makeInitState()
@@ -55,7 +55,7 @@ class LocationsViewModelTest {
     fun make_init_state__require_no_permissions() {
         assertThat(
             createViewModel(
-                permissionUtil = mockk {
+                permissionRepository = mockk {
                     every { hasPermissionFor(Permission.LocationPermission()) } returns true
                 }
             ).makeInitState()
@@ -104,11 +104,11 @@ class LocationsViewModelTest {
 
     @Test
     fun plus_zeros_permission__when_location_access_granted() {
-        val permissionUtil: PermissionUtil = mockk {
+        val permissionRepository: PermissionRepository = mockk {
             every { hasPermissionFor(Permission.LocationPermission()) } returns false
         }
 
-        val viewModel = createViewModel(permissionUtil = permissionUtil)
+        val viewModel = createViewModel(permissionRepository = permissionRepository)
         val initState = viewModel.makeInitState()
         val results = listOf(
             PermissionUseCase.Results.LocationPermissionDenied,
