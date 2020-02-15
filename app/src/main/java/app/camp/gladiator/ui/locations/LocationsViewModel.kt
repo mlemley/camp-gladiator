@@ -45,7 +45,7 @@ class LocationsViewModel(
     override fun Flow<Events>.eventTransform(): Flow<Action> = flow {
         collect {
             when (it) {
-                is Events.GatherLocationsNearMe -> TODO()
+                is Events.GatherLocationsNearMe -> emit(CampGladiatorLocationsUseCase.Actions.GatherLocationsNearMe)
                 is Events.PermissionsResponse -> emit(PermissionUseCase.PermissionResponseReceived(it.permissions))
             }.exhaustive
         }
@@ -54,6 +54,7 @@ class LocationsViewModel(
     override fun LocationsState.plus(result: Result): LocationsState {
         return when (result) {
             is PermissionUseCase.Results.LocationPermissionGranted -> copy(requiredPermission = null)
+            is CampGladiatorLocationsUseCase.Results.LocationsGathered -> copy(locations = result.locations)
             else -> this
         }
     }
