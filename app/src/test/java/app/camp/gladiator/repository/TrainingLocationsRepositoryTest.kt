@@ -21,7 +21,7 @@ class TrainingLocationsRepositoryTest {
         TrainingLocationsRepository(campGladiatorApiClient)
 
     @Test
-    fun example() {
+    fun provides_access_to_training_locations() {
         val trainingLocations = listOf(mockk<TrainingLocation>())
         val location = Location(LocationManager.PASSIVE_PROVIDER).apply {
             latitude = 30.406991
