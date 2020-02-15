@@ -11,7 +11,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="app.camp.gladiator.ui.home.HomeFragment"
+        android:name="app.camp.gladiator.ui.locations.LocationsFragment"
         android:label="@string/title_locations"
         tools:layout="@layout/fragment_home" />
 
