@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Camp Gladiator</string>
+
+    <!-- Permissions Screen -->
+    <string name="permission_rationale">We need your location to show Camp Gladiator near you.</string>
+    <string name="enable">enable</string>
+    <string name="keep_disabled">keep disabled</string>
+
+    <!-- Locations Screen -->
     <string name="title_locations">Locations</string>
+
 </resources>

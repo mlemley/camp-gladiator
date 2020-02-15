@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.camp.gladiator.app.Helpers
+import app.camp.gladiator.app.Helpers.grantPermissions
 import app.camp.gladiator.app.TestCampGladiatorApplication
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -15,11 +17,7 @@ class PermissionUtilTest {
     private val context: Context =
         ApplicationProvider.getApplicationContext<TestCampGladiatorApplication>()
 
-    private fun grantPermissions(vararg permissions: String) {
-        shadowOf(
-            ApplicationProvider.getApplicationContext<TestCampGladiatorApplication>()
-        ).grantPermissions(*permissions)
-    }
+
 
     @Test
     fun checks_for_user_permission__given_user_has_granted_location_permission() {

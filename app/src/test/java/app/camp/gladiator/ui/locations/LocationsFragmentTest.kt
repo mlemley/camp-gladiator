@@ -2,17 +2,25 @@ package app.camp.gladiator.ui.locations
 
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.lifecycle.LiveData
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.camp.gladiator.app.Helpers.denyPermissions
 import app.camp.gladiator.app.Helpers.loadModules
+import app.camp.gladiator.app.TestCampGladiatorApplication
+import app.camp.gladiator.util.Permission
+import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
+import org.robolectric.Shadows.shadowOf
+import org.robolectric.shadows.ShadowAlertDialog
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -50,6 +58,8 @@ class LocationsFragmentTest {
             every { state } returns mockk(relaxUnitFun = true)
         }
         createScenario(locationsViewModel = viewModel).onFragment { fragment ->
+            fragment.stateObserver.onChanged(
+                LocationsViewModel.LocationsState())
 
             verify {
                 viewModel.dispatchEvent(LocationsViewModel.Events.GatherLocationsNearMe)
@@ -57,5 +67,32 @@ class LocationsFragmentTest {
         }
     }
 
+    @Ignore
+    @Test
+    fun permission_request__requests_when_and_do_not_require_rationale() {
+        // TODO Test belongs in espresso
+    }
 
+    @Ignore
+    @Test
+    fun permission_request__show_required_rationale__when_permission_already_denied() {
+        // TODO Test belongs in espresso
+        denyPermissions(Permission.LocationPermission().name)
+
+        val permissionRationale = "This is the reason for the permission"
+        createScenario().onFragment { fragment ->
+            fragment.stateObserver.onChanged(
+                LocationsViewModel.LocationsState(
+                    requiredPermission = Permission.LocationPermission(),
+                    permissionRationale = permissionRationale
+
+                )
+            )
+
+            val dialog = ShadowAlertDialog.getLatestAlertDialog()
+            assertThat(dialog).isNotNull()
+            assertThat(shadowOf(dialog).message).isEqualTo(permissionRationale)
+
+        }
+    }
 }

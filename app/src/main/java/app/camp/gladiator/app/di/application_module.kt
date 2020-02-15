@@ -1,5 +1,6 @@
 package app.camp.gladiator.ui.app.di
 
+import app.camp.gladiator.R
 import app.camp.gladiator.ui.locations.LocationsViewModel
 import app.camp.gladiator.ui.welcome.WelcomeScreenViewModel
 import app.camp.gladiator.util.PermissionUtil
@@ -16,6 +17,7 @@ import org.koin.dsl.module
 val appModule = module {
     // Injectable Constants
     single(named("WelcomeScreenDelay")) { 700L }
+    single(named("LocationPermissionRationale")) { androidContext().getString(R.string.permission_rationale) }
 
     // Util
     single { PermissionUtil(androidContext()) }
@@ -24,7 +26,7 @@ val appModule = module {
     factory { DelayedCallback() }
 
     viewModel { WelcomeScreenViewModel(get(), get(named("WelcomeScreenDelay"))) }
-    viewModel { LocationsViewModel() }
+    viewModel { LocationsViewModel(get(), get(named("LocationPermissionRationale"))) }
 }
 
 @FlowPreview
