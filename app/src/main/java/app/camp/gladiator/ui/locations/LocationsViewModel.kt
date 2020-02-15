@@ -7,6 +7,7 @@ import app.camp.gladiator.extensions.exhaustive
 import app.camp.gladiator.util.Permission
 import app.camp.gladiator.util.PermissionUtil
 import app.camp.gladiator.viewmodel.*
+import app.camp.gladiator.viewmodel.usecase.PermissionUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,8 @@ import kotlinx.coroutines.flow.flow
 @ExperimentalCoroutinesApi
 class LocationsViewModel(
     val permissionUtil: PermissionUtil,
-    val permissionRationale: String
+    val permissionRationale: String,
+    permissionUseCase: PermissionUseCase
 ) :
     BaseViewModel<LocationsViewModel.Events, LocationsViewModel.LocationsState>() {
     sealed class Events : Event {

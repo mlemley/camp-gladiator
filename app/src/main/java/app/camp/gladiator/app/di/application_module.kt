@@ -5,6 +5,7 @@ import app.camp.gladiator.ui.locations.LocationsViewModel
 import app.camp.gladiator.ui.welcome.WelcomeScreenViewModel
 import app.camp.gladiator.util.PermissionUtil
 import app.camp.gladiator.viewmodel.usecase.DelayedCallback
+import app.camp.gladiator.viewmodel.usecase.PermissionUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.koin.android.ext.koin.androidContext
@@ -24,9 +25,10 @@ val appModule = module {
 
     // UseCases
     factory { DelayedCallback() }
+    factory { PermissionUseCase() }
 
     viewModel { WelcomeScreenViewModel(get(), get(named("WelcomeScreenDelay"))) }
-    viewModel { LocationsViewModel(get(), get(named("LocationPermissionRationale"))) }
+    viewModel { LocationsViewModel(get(), get(named("LocationPermissionRationale")), get()) }
 }
 
 @FlowPreview
