@@ -1,9 +1,12 @@
 package app.camp.gladiator.ui.app.di
 
+import app.camp.gladiator.ui.locations.LocationsViewModel
 import app.camp.gladiator.ui.welcome.WelcomeScreenViewModel
+import app.camp.gladiator.util.PermissionUtil
 import app.camp.gladiator.viewmodel.usecase.DelayedCallback
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -14,13 +17,14 @@ val appModule = module {
     // Injectable Constants
     single(named("WelcomeScreenDelay")) { 700L }
 
+    // Util
+    single { PermissionUtil(androidContext()) }
+
     // UseCases
     factory { DelayedCallback() }
 
-    viewModel {
-        WelcomeScreenViewModel(get(), get(named("WelcomeScreenDelay")))
-    }
-
+    viewModel { WelcomeScreenViewModel(get(), get(named("WelcomeScreenDelay"))) }
+    viewModel { LocationsViewModel() }
 }
 
 @FlowPreview
