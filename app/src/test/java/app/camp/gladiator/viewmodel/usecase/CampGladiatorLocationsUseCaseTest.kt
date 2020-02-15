@@ -53,7 +53,7 @@ class CampGladiatorLocationsUseCaseTest {
         }
         val trainingLocations = listOf<TrainingLocation>(mockk())
         val trainingLocationsRepository = mockk<TrainingLocationsRepository> {
-            every { trainingFacilitiesNear(location) } returns trainingLocations
+            every { runBlocking { trainingFacilitiesNear(location) } } returns trainingLocations
         }
 
         val useCase = createUseCase(locationRepository, trainingLocationsRepository)
@@ -65,13 +65,12 @@ class CampGladiatorLocationsUseCaseTest {
         }
     }
 
-
     @Test
     fun fetches_locations_near_supplied_location() {
         val location = mockk<Location>()
         val trainingLocations = listOf<TrainingLocation>(mockk())
         val trainingLocationsRepository = mockk<TrainingLocationsRepository> {
-            every { trainingFacilitiesNear(location) } returns trainingLocations
+            every { runBlocking { trainingFacilitiesNear(location) } } returns trainingLocations
         }
 
         val useCase = createUseCase(trainingLocationsRepository = trainingLocationsRepository)

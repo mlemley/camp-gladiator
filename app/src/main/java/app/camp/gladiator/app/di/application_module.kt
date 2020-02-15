@@ -6,6 +6,7 @@ import app.camp.gladiator.extensions.app.locationManager
 import app.camp.gladiator.extensions.app.locationServices
 import app.camp.gladiator.repository.LocationRepository
 import app.camp.gladiator.repository.PermissionRepository
+import app.camp.gladiator.repository.TrainingLocationsRepository
 import app.camp.gladiator.ui.locations.LocationsViewModel
 import app.camp.gladiator.ui.welcome.WelcomeScreenViewModel
 import app.camp.gladiator.viewmodel.usecase.DelayedCallback
@@ -28,9 +29,10 @@ val appModule = module {
     factory { androidContext().locationServices }
     factory { androidContext().locationManager }
 
-    // Util
+    // Repositories
     single { PermissionRepository(androidContext()) }
     factory { LocationRepository(get(), get()) }
+    factory { TrainingLocationsRepository(get()) }
 
     // UseCases
     factory { DelayedCallback() }
