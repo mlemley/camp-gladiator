@@ -28,6 +28,7 @@ class WelcomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
         welcomeViewModel.state.observe(this@WelcomeActivity, stateObserver)
+        welcomeViewModel.dispatchEvent(WelcomeScreenViewModel.Events.Init)
     }
 
     private fun navigateHome() {

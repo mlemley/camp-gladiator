@@ -1,31 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="CampGladiator" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimaryVariant">#000000</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorSecondary">#2962FF</item>
-        <item name="colorSecondaryVariant">#0039CB</item>
-        <item name="colorOnSecondary">#FFFFFF</item>
-        <item name="colorError">#F44336</item>
-        <item name="colorOnError">#FFFFFF</item>
-        <item name="colorSurface">#FFFFFF</item>
-        <item name="colorOnSurface">#212121</item>
-        <item name="android:colorBackground">@color/background</item>
-        <item name="colorOnBackground">#212121</item>
-
+    <style name="CampGladiator" parent="CampGladiator.Base">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
-    <style name="CampGladiator.Dark">
+    <style name="CampGladiator.Dark" parent="CampGladiator.Base">
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowLightStatusBar">false</item>

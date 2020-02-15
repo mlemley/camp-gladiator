@@ -47,6 +47,18 @@ class WelcomeActivityTest {
     }
 
     @Test
+    fun dispatches_init_event_when_loaded() {
+        val viewModel:WelcomeScreenViewModel = mockk(relaxUnitFun = true) {
+            every { state } returns mockk(relaxUnitFun = true)
+        }
+        createScenario(viewModel = viewModel).onActivity { activity ->
+            verify {
+                viewModel.dispatchEvent(WelcomeScreenViewModel.Events.Init)
+            }
+        }.close()
+    }
+
+    @Test
     fun proceeds_forward_when_instructed() {
         createScenario().onActivity { activity ->
             activity.stateObserver.onChanged(
