@@ -4,6 +4,9 @@ apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 apply plugin: "com.adarshr.test-logger"
 
+def googleApiKeyRelease = System.getenv("GOOGLE_API_KEY") ? System.getenv("GOOGLE_API_KEY") : GOOGLE_API_KEY
+def googleApiKeyDebug = System.getenv("GOOGLE_API_KEY_DEBUG") ? System.getenv("GOOGLE_API_KEY") : GOOGLE_API_KEY
+
 testlogger {
     //https://github.com/radarsh/gradle-test-logger-plugin
     theme 'mocha'
@@ -34,11 +37,17 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            manifestPlaceholders = [
+                    "googleApiKey": "$googleApiKeyRelease"
+            ]
         }
 
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
+            manifestPlaceholders = [
+                    "googleApiKey": "$googleApiKeyDebug"
+            ]
 
         }
     }

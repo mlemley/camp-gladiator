@@ -6,6 +6,24 @@ Project created using [Android Studio](https://developer.android.com/studio/inde
 
 Checkout Project from [Camp Gladiator](https://github.com/mlemley/camp-gladiator)
 
+### Google Map Api Access
+
+In order for google maps to work follow the steps to [obtain an API token](https://developers.google.com/maps/documentation/android-sdk/get-api-key) for usage of the google map platform
+
+Ensure that both:
+1) [Map Api Support is enabled](https://console.cloud.google.com/apis/library/maps-android-backend.googleapis.com)
+2) [Api Key has been created](https://console.cloud.google.com/apis/credentials)
+
+update either the local gradle.properties or the global gradle.properties located in `$HOME/.gradle/gradle.properties` 
+to contain the following values for the development and production API keys.  If a `gradle.properties` does not exist 
+in `$HOME/.gradle/` directory you can create the file and add the keys
+
+```gradle.properties
+
+GOOGLE_API_KEY={$production.key}
+
+GOOGLE_API_KEY_DEBUG={$debug.key}
+```
 
 ### Test Frameworks Employed
 * [Robolectric.org](https://robolectric.org) for integration / unit tests that touch the android framework
