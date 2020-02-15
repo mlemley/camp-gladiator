@@ -6,6 +6,8 @@ apply plugin: "com.adarshr.test-logger"
 
 def googleApiKeyRelease = System.getenv("GOOGLE_API_KEY") ? System.getenv("GOOGLE_API_KEY") : GOOGLE_API_KEY
 def googleApiKeyDebug = System.getenv("GOOGLE_API_KEY_DEBUG") ? System.getenv("GOOGLE_API_KEY") : GOOGLE_API_KEY
+println(googleApiKeyRelease)
+println(googleApiKeyDebug)
 
 testlogger {
     //https://github.com/radarsh/gradle-test-logger-plugin
@@ -37,17 +39,14 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            manifestPlaceholders = [
-                    "googleApiKey": "$googleApiKeyRelease"
-            ]
+            resValue "string", "google_maps_key", googleApiKeyRelease ?: ""
+
         }
 
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
-            manifestPlaceholders = [
-                    "googleApiKey": "$googleApiKeyDebug"
-            ]
+            resValue "string", "google_maps_key", googleApiKeyDebug ?: ""
 
         }
     }
@@ -107,6 +106,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$androidx_lifecycle_version"
 
     implementation "com.google.android.gms:play-services-location:$play_services_location_version"
+    implementation "com.google.android.gms:play-services-maps:$play_services_maps_version"
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
 
     implementation "androidx.navigation:navigation-runtime-ktx:$ktx_navigation_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$ktx_navigation_version"

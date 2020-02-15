@@ -9,6 +9,7 @@ import app.camp.gladiator.repository.PermissionRepository
 import app.camp.gladiator.repository.TrainingLocationsRepository
 import app.camp.gladiator.ui.locations.LocationsViewModel
 import app.camp.gladiator.ui.welcome.WelcomeScreenViewModel
+import app.camp.gladiator.viewmodel.usecase.CampGladiatorLocationsUseCase
 import app.camp.gladiator.viewmodel.usecase.DelayedCallback
 import app.camp.gladiator.viewmodel.usecase.PermissionUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,6 +38,7 @@ val appModule = module {
     // UseCases
     factory { DelayedCallback() }
     factory { PermissionUseCase() }
+    factory { CampGladiatorLocationsUseCase(get(), get()) }
 
     viewModel { WelcomeScreenViewModel(get(), get(named("WelcomeScreenDelay"))) }
     viewModel { LocationsViewModel(get(), get(named("LocationPermissionRationale")), get(), get()) }
