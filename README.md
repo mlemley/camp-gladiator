@@ -14,7 +14,7 @@ Ensure that both:
 1) [Map Api Support is enabled](https://console.cloud.google.com/apis/library/maps-android-backend.googleapis.com)
 2) [Api Key has been created](https://console.cloud.google.com/apis/credentials)
 
-update either the local gradle.properties or the global gradle.properties located in `$HOME/.gradle/gradle.properties` 
+Update either the local gradle.properties or the global gradle.properties located in `$HOME/.gradle/gradle.properties` 
 to contain the following values for the development and production API keys.  If a `gradle.properties` does not exist 
 in `$HOME/.gradle/` directory you can create the file and add the keys
 
