@@ -12,10 +12,12 @@ class LocationRepository(
     private val permissionRepository: PermissionRepository
 ) {
     @SuppressLint("MissingPermission")
-    suspend fun lastKnownLocation(): Location? = withContext(Dispatchers.IO) {
+    suspend fun lastKnownLocation(): Location = withContext(Dispatchers.IO) {
         if (permissionRepository.hasPermissionFor(Permission.LocationPermission()))
-            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        else Location(LocationManager.PASSIVE_PROVIDER)
+            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) ?: emptyLocation()
+        else emptyLocation()
     }
+
+    private fun emptyLocation(): Location = Location(LocationManager.PASSIVE_PROVIDER)
 
 }

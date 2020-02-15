@@ -36,7 +36,7 @@ val appModule = module {
     factory { PermissionUseCase() }
 
     viewModel { WelcomeScreenViewModel(get(), get(named("WelcomeScreenDelay"))) }
-    viewModel { LocationsViewModel(get(), get(named("LocationPermissionRationale")), get()) }
+    viewModel { LocationsViewModel(get(), get(named("LocationPermissionRationale")), get(), get()) }
 }
 
 @FlowPreview

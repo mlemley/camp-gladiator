@@ -5,6 +5,7 @@ import app.camp.gladiator.repository.Permission
 import app.camp.gladiator.repository.PermissionRepository
 import app.camp.gladiator.ui.locations.LocationsViewModel.LocationsState
 import app.camp.gladiator.viewmodel.Action
+import app.camp.gladiator.viewmodel.usecase.CampGladiatorLocationsUseCase
 import app.camp.gladiator.viewmodel.usecase.PermissionUseCase
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
@@ -28,12 +29,26 @@ class LocationsViewModelTest {
         permissionRepository: PermissionRepository = mockk(relaxUnitFun = true) {
             every { hasPermissionFor(Permission.LocationPermission()) } returns true
         },
-        permissionUseCase: PermissionUseCase = mockk(relaxUnitFun = true)
-    ): LocationsViewModel = LocationsViewModel(
+        permissionUseCase: PermissionUseCase = mockk(relaxUnitFun = true),
+        campGladiatorLoctionsUseCase: CampGladiatorLocationsUseCase = mockk(relaxUnitFun = true)
+        ): LocationsViewModel = LocationsViewModel(
         permissionRepository,
         permissionRationale,
-        permissionUseCase
+        permissionUseCase,
+        campGladiatorLoctionsUseCase
     )
+
+    @Test
+    fun contains_expected_use_cases() {
+        val permissionUseCase = mockk<PermissionUseCase>(relaxUnitFun = true)
+        val campGladiatorLocationsUseCase = mockk<CampGladiatorLocationsUseCase>(relaxUnitFun = true)
+        val viewModel = createViewModel(
+            permissionUseCase = permissionUseCase,
+            campGladiatorLoctionsUseCase = campGladiatorLocationsUseCase
+        )
+
+        assertThat(viewModel.useCases).isEqualTo(listOf(permissionUseCase, campGladiatorLocationsUseCase))
+    }
 
     @Test
     fun make_init_state__require_location_permission() {
@@ -64,14 +79,6 @@ class LocationsViewModelTest {
                 permissionRationale = permissionRationale
             )
         )
-    }
-
-    @Test
-    fun contains_expected_use_cases() {
-        val permissionUseCase = mockk<PermissionUseCase>(relaxUnitFun = true)
-        val viewModel = createViewModel(permissionUseCase = permissionUseCase)
-
-        assertThat(viewModel.useCases).isEqualTo(listOf(permissionUseCase))
     }
 
     @Test
