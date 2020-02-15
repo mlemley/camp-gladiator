@@ -1,6 +1,7 @@
 package app.camp.gladiator.ui.app.di
 
 import app.camp.gladiator.R
+import app.camp.gladiator.client.cg.campGladiatorApiModule
 import app.camp.gladiator.extensions.app.locationManager
 import app.camp.gladiator.extensions.app.locationServices
 import app.camp.gladiator.repository.LocationRepository
@@ -42,5 +43,6 @@ val appModule = module {
 @FlowPreview
 @ExperimentalCoroutinesApi
 val campGladiatorModules = listOf(
-    appModule
+    appModule,
+    campGladiatorApiModule
 )

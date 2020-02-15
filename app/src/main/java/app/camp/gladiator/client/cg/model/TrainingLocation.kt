@@ -1,9 +1,12 @@
 package app.camp.gladiator.client.cg.model
 
-/*
-    {"success":true,"message":"success","data":[{"placeID":"841","regionID":"REG-J1271657944REG-4bcbf5d896ed5","subRegionID":"193","placeName":"North Austin: Domain North Side - Whole Foods","placeDesc":"Front Parking Lot","placeAdditionalInfo":"Underground Parking Garage","placeAddress1":"11920 Domain Dr","placeAddress2":null,"placeCity":"Austin","placeState":"TX","placeZipcode":"78758","placeCountry":"US","placeLatitude":"30.406991","placeLongitude":"-97.720310","placeActive":"1","distance":"0","location":[{"ID":"19188","locationID":"LOC-F1554184656LOC-5ca2f9d010084","regionID":"REG-J1271657944REG-4bcbf5d896ed5","trainerID":"A-V1474400744A-57e191e8dd313","placeID":"841","locationName":"North Austin: Domain North Side - Whole Foods - 4:45 AM - M,T,TH","locationLatitude":"30.406991","locationLongitude":"-97.720310","locationFullAddress":"11920 Domain Dr Austin, TX 78758","locationAddress1":null,"locationAddress2":null,"locationCity":null,"locationZipcode":null,"locationAlternate":"Underground Parking Garage ","locationTime":"04:45:00","locationStartHour":"4","locationStartMin":"45","locationStartMeridiem":"AM","locationEndHour":"5","locationEndMin":"45","locationEndMeridiem":"AM","locationDesc":"Front Parking Lot ","locationFullDesc":null,"locationIsVisible":"1","locationActive":"1","locationDay":"M,T,TH","underPerformingCount":"0","locationAge":"0","locationOriginalStartDate":"2016-03-06","locationDateEntered":"2019-04-02 00:57:36","locationStartMeetDate":"2019-04-21","locationEndMeetDate":null,"locationStartDate":"2019-04-21","locationStartRegistrationDate":"2019-04-14","locationEndRegistrationDate":null,"locationEndDate":null,"locationModifiedDate":"2019-05-02 10:45:22","locationAvgRating":null,"parentLocationID":"LOC-A1523470694LOC-5ace5166deb72","rootParentLocationID":"LOC-M1457137218LOC-56da264256b99","locationInactiveDate":null,"isApproved":"1","originalSubmissionDate":null,"approvedDate":null,"lastSubmissionDate":null,"trainers":[{"adminUserID":"A-V1474400744A-57e191e8dd313","adminUserFirstname":"Stormy","adminUserLastname":"Hagaman","adminUserPhone":"2082497794","adminUserEmail":"stormyhagaman@campgladiator.com","adminUserPhoto":"http:\/\/cgcdn.s3.amazonaws.com\/nation\/users\/UID-E1474323089UID-57e062918b422.png","locationSplitPerc":"50.00"},{"adminUserID":"A-X1387400960A-52b20f005c7b4","adminUserFirstname":"Joel","adminUserLastname":"Hagaman","adminUserPhone":"2082497624","adminUserEmail":"joelhagaman@campgladiator.com","adminUserPhoto":"http:\/\/cgcdn.s3.amazonaws.com\/nation\/users\/UID-L1387310846UID-52b0aefe8a1d0.png","locationSplitPerc":"50.00"}]}
-* */
+import com.google.gson.annotations.SerializedName
+
 data class TrainingLocation(
-    val latitude:String,
-    val longitude:String
+    @SerializedName("placeName")
+    val name:String,
+    @SerializedName("placeLatitude")
+    val latitude:Double,
+    @SerializedName("placeLongitude")
+    val longitude:Double
 )

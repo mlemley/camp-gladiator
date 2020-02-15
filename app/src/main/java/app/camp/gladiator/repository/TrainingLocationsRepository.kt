@@ -8,5 +8,4 @@ class TrainingLocationsRepository {
     fun trainingFacilitiesNear(location: Location): List<TrainingLocation> {
         return emptyList()
     }
-
 }

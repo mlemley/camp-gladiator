@@ -5,6 +5,8 @@ import androidx.test.core.app.ApplicationProvider
 import app.camp.gladiator.extensions.app.locationManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 import org.koin.core.context.loadKoinModules
 import org.koin.core.module.Module
 import org.robolectric.Shadows.shadowOf
@@ -39,5 +41,17 @@ object Helpers {
                 .locationManager
         ).setLastKnownLocation(location.provider, location)
     }
+
+    fun enqueueSuccessfulResponse(mockWebServer: MockWebServer, code: Int, content: String) =
+        mockWebServer.enqueue(
+            mockSuccessfulResponse(code, content)
+        )
+
+    fun mockSuccessfulResponse(code: Int, content: String): MockResponse =
+        MockResponse().mockSuccess(code, content)
+
+    fun MockResponse.mockSuccess(code: Int, content: String): MockResponse =
+        this.setResponseCode(code).setBody(content)
+
 }
 
