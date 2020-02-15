@@ -22,7 +22,4 @@ class PermissionUtil constructor(private val context: Context) {
     fun hasPermissionFor(permission: Permission): Boolean {
         return ContextCompat.checkSelfPermission(context, permission.name) == PackageManager.PERMISSION_GRANTED
     }
-
-    fun foo() {
-    }
 }
