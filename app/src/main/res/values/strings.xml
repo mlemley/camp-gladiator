@@ -8,5 +8,6 @@
 
     <!-- Locations Screen -->
     <string name="title_locations">Locations</string>
+    <string name="search_for_locations">Search for locations</string>
 
 </resources>

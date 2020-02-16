@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 object CampGladiatorApiFactory {
-    private const val apiBaseUrl = "https://api.pro.coinbase.com"
+    private const val apiBaseUrl = "https://stagingapi.campgladiator.com"
 
     private val client = OkHttpClient().newBuilder()
         // add interceptors here

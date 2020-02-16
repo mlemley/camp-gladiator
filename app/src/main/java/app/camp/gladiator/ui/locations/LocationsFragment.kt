@@ -6,12 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import app.camp.gladiator.R
 import app.camp.gladiator.repository.Permission
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.koin.android.ext.android.inject
@@ -19,7 +20,7 @@ import org.koin.android.ext.android.inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class LocationsFragment : OnMapReadyCallback, SupportMapFragment() {
+class LocationsFragment : OnMapReadyCallback, Fragment() {
 
     private val locationsViewModel: LocationsViewModel by inject()
 
@@ -35,8 +36,7 @@ class LocationsFragment : OnMapReadyCallback, SupportMapFragment() {
         }
     }
 
-    override fun onMapReady(p0: GoogleMap?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onMapReady(map: GoogleMap?) {
     }
 
     override fun onRequestPermissionsResult(
@@ -59,9 +59,10 @@ class LocationsFragment : OnMapReadyCallback, SupportMapFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState).also {
-            locationsViewModel.state.observe(viewLifecycleOwner, stateObserver)
-        }
+        val view = inflater.inflate(R.layout.fragment_locations, container, false)
+        (activity as AppCompatActivity).supportActionBar?.hide()
+        locationsViewModel.state.observe(viewLifecycleOwner, stateObserver)
+        return view
     }
 
     private fun requestPermissionsFor(permission: Permission, rationale: String) =
