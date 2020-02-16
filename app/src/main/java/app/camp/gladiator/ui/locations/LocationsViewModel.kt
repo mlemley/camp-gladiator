@@ -54,7 +54,7 @@ class LocationsViewModel(
     override fun LocationsState.plus(result: Result): LocationsState {
         return when (result) {
             is PermissionUseCase.Results.LocationPermissionGranted -> copy(requiredPermission = null)
-            is CampGladiatorLocationsUseCase.Results.LocationsGathered -> copy(locations = result.locations)
+            is CampGladiatorLocationsUseCase.Results.LocationsGathered -> copy(locations = result.locations, userLocation = result.usersLocation)
             else -> this
         }
     }

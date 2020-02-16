@@ -61,7 +61,7 @@ class CampGladiatorLocationsUseCaseTest {
         runBlocking {
             val results = useCase.handleAction(Actions.GatherLocationsNearMe).toList()
             assertThat(results[0]).isEqualTo(Results.LocationsLoading)
-            assertThat(results[1]).isEqualTo(Results.LocationsGathered(trainingLocations))
+            assertThat(results[1]).isEqualTo(Results.LocationsGathered(trainingLocations, location))
         }
     }
 

@@ -1,6 +1,7 @@
 package app.camp.gladiator.ui.locations
 
 import android.content.pm.PackageManager
+import android.location.Location
 import app.camp.gladiator.client.cg.model.TrainingLocation
 import app.camp.gladiator.repository.Permission
 import app.camp.gladiator.repository.PermissionRepository
@@ -32,7 +33,7 @@ class LocationsViewModelTest {
         },
         permissionUseCase: PermissionUseCase = mockk(relaxUnitFun = true),
         campGladiatorLocationsUseCase: CampGladiatorLocationsUseCase = mockk(relaxUnitFun = true)
-        ): LocationsViewModel = LocationsViewModel(
+    ): LocationsViewModel = LocationsViewModel(
         permissionRepository,
         permissionRationale,
         permissionUseCase,
@@ -42,13 +43,19 @@ class LocationsViewModelTest {
     @Test
     fun contains_expected_use_cases() {
         val permissionUseCase = mockk<PermissionUseCase>(relaxUnitFun = true)
-        val campGladiatorLocationsUseCase = mockk<CampGladiatorLocationsUseCase>(relaxUnitFun = true)
+        val campGladiatorLocationsUseCase =
+            mockk<CampGladiatorLocationsUseCase>(relaxUnitFun = true)
         val viewModel = createViewModel(
             permissionUseCase = permissionUseCase,
             campGladiatorLocationsUseCase = campGladiatorLocationsUseCase
         )
 
-        assertThat(viewModel.useCases).isEqualTo(listOf(permissionUseCase, campGladiatorLocationsUseCase))
+        assertThat(viewModel.useCases).isEqualTo(
+            listOf(
+                permissionUseCase,
+                campGladiatorLocationsUseCase
+            )
+        )
     }
 
     @Test
@@ -140,16 +147,43 @@ class LocationsViewModelTest {
     }
 
     @Test
-    fun plus_merges_locations_fetch_from_training_facility_lookup() {
+    fun plus_merges_user_location() {
         val viewModel = createViewModel()
         val initState = viewModel.makeInitState()
+        val usersLocation = mockk<Location>()
+        val locations = listOf<TrainingLocation>(mockk())
+        val results = listOf(
+            CampGladiatorLocationsUseCase.Results.LocationsGathered(
+                locations = locations,
+                usersLocation = usersLocation
+            )
+        )
+
+        val expectedStates = listOf(
+            initState.copy(locations = locations, userLocation = usersLocation)
+        )
+
+        val actualStates = mutableListOf<LocationsState>()
+        with(viewModel) {
+            results.forEach {
+                actualStates.add(initState + it)
+            }
+        }
+
+        assertThat(actualStates).isEqualTo(expectedStates)
+    }
+
+    @Test
+    fun plus_merges_locations_fetch_from_training_facility_lookup() {
+        val viewModel = createViewModel()
+        val initState = viewModel.makeInitState().copy(userLocation = mockk())
         val locations = listOf<TrainingLocation>(mockk())
         val results = listOf(
             CampGladiatorLocationsUseCase.Results.LocationsGathered(locations = locations)
         )
 
         val expectedStates = listOf(
-            initState.copy(locations = locations)
+            initState.copy(locations = locations, userLocation = null)
         )
 
         val actualStates = mutableListOf<LocationsState>()

@@ -2,17 +2,22 @@ package app.camp.gladiator.ui.locations
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import app.camp.gladiator.R
+import app.camp.gladiator.client.cg.model.TrainingLocation
+import app.camp.gladiator.extensions.app.asLatLng
 import app.camp.gladiator.repository.Permission
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.koin.android.ext.android.inject
@@ -20,9 +25,12 @@ import org.koin.android.ext.android.inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class LocationsFragment : OnMapReadyCallback, Fragment() {
+class LocationsFragment : Fragment() {
 
     private val locationsViewModel: LocationsViewModel by inject()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val mapFragment: SupportMapFragment get() = childFragmentManager.findFragmentByTag("map") as SupportMapFragment
 
     val stateObserver: Observer<LocationsViewModel.LocationsState> = Observer { state ->
         when {
@@ -33,10 +41,25 @@ class LocationsFragment : OnMapReadyCallback, Fragment() {
             state.locations.isEmpty() -> locationsViewModel.dispatchEvent(
                 LocationsViewModel.Events.GatherLocationsNearMe
             )
+            state.locations.isNotEmpty() -> plotLocations(state.locations, state.userLocation)
         }
     }
 
-    override fun onMapReady(map: GoogleMap?) {
+    private fun plotLocations(locations: List<TrainingLocation>, usersLocation: Location?) {
+        mapFragment.getMapAsync { map ->
+            locations.forEach { location ->
+                if (location.containValidCoordinates) {
+                    map.addMarker(MarkerOptions().position(
+                        location.asLatLng()
+                    ).title(location.name))
+                }
+            }
+
+            usersLocation?.let {location ->
+                map.isMyLocationEnabled = true
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(location.asLatLng(), 12F))
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(

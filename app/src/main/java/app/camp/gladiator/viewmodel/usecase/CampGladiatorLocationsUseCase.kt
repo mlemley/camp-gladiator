@@ -29,7 +29,10 @@ class CampGladiatorLocationsUseCase(
 
     sealed class Results : Result {
         object LocationsLoading : Results()
-        data class LocationsGathered(val locations: List<TrainingLocation>) : Results()
+        data class LocationsGathered(
+            val locations: List<TrainingLocation>,
+            val usersLocation: Location? = null
+        ) : Results()
     }
 
     override fun canProcess(action: Action): Boolean = action is Actions
@@ -40,7 +43,7 @@ class CampGladiatorLocationsUseCase(
         else -> emptyFlow()
     }
 
-    private fun handleGatherNear(location: Location): Flow<Result> = channelFlow<Result>{
+    private fun handleGatherNear(location: Location): Flow<Result> = channelFlow<Result> {
         send(Results.LocationsLoading)
         send(
             Results.LocationsGathered(
@@ -53,11 +56,13 @@ class CampGladiatorLocationsUseCase(
 
     private fun handleGatherNearMe(): Flow<Result> = channelFlow<Result> {
         send(Results.LocationsLoading)
+        val location = locationRepository.lastKnownLocation()
         send(
             Results.LocationsGathered(
                 trainingLocationsRepository.trainingFacilitiesNear(
-                    locationRepository.lastKnownLocation()
-                )
+                    location
+                ),
+                location
             )
         )
     }.flowOn(Dispatchers.IO)
