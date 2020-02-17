@@ -2,7 +2,6 @@ package app.camp.gladiator.ui.locations
 
 import android.app.AlertDialog
 import android.content.DialogInterface
-import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +10,8 @@ import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import app.camp.gladiator.R
-import app.camp.gladiator.client.cg.model.TrainingLocation
 import app.camp.gladiator.repository.Permission
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -49,6 +48,21 @@ class LocationsFragment : Fragment() {
         }
     }
 
+    val onCameraMoveListener = GoogleMap.OnCameraMoveListener {
+
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_locations, container, false)
+        locationsViewModel.state.observe(viewLifecycleOwner, stateObserver)
+        return view
+    }
+
+    // TODO: pull up into base class when permissions count are > 1
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -64,16 +78,7 @@ class LocationsFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_locations, container, false)
-        locationsViewModel.state.observe(viewLifecycleOwner, stateObserver)
-        return view
-    }
-
+    // TODO: pull up into base class when permissions count are > 1
     private fun requestPermissionsFor(permission: Permission, rationale: String) =
         if (shouldShowRequestPermissionRationale(permission.name)) {
             context?.let {

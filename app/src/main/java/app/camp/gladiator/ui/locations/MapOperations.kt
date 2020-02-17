@@ -32,4 +32,11 @@ sealed class MapOperations : MapOperation {
             }
         }
     }
+
+    class ObserveCameraMove(val onCameraMoveListener:GoogleMap.OnCameraMoveListener):MapOperations() {
+        override fun operateWith(map: GoogleMap) {
+            map.setOnCameraMoveListener(onCameraMoveListener)
+        }
+
+    }
 }

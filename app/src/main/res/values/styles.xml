@@ -1,4 +1,5 @@
 <resources>
+
     <style name="CampGladiator.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -33,6 +34,22 @@
         <item name="android:elevation">0dp</item>
     </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
+    <style name="Button.SearchHere" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/colorDisplayText</item>
+        <item name="android:background">@drawable/background_search_here</item>
+        <item name="android:textAppearance">@style/TextAppearance.OnLightButton</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:paddingStart">32dp</item>
+        <item name="android:paddingEnd">32dp</item>
+    </style>
+
+    <style name="TextAppearance.OnLightButton" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:color">@color/colorDisplayText</item>
+        <item name="android:textColor">@color/colorDisplayText</item>
+    </style>
 
 </resources>
