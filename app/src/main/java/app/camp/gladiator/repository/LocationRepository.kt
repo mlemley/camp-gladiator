@@ -14,7 +14,7 @@ class LocationRepository(
     @SuppressLint("MissingPermission")
     suspend fun lastKnownLocation(): Location = withContext(Dispatchers.IO) {
         if (permissionRepository.hasPermissionFor(Permission.LocationPermission()))
-            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) ?: emptyLocation()
+            locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER) ?: emptyLocation()
         else emptyLocation()
     }
 

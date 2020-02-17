@@ -41,7 +41,7 @@ val appModule = module {
     factory { CampGladiatorLocationsUseCase(get(), get()) }
 
     viewModel { WelcomeScreenViewModel(get(), get(named("WelcomeScreenDelay"))) }
-    viewModel { LocationsViewModel(get(), get(named("LocationPermissionRationale")), get(), get()) }
+    viewModel { LocationsViewModel(get(), get(named("LocationPermissionRationale")), get(), get(), get()) }
 }
 
 @FlowPreview

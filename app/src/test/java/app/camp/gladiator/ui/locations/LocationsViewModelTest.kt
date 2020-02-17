@@ -3,6 +3,7 @@ package app.camp.gladiator.ui.locations
 import android.content.pm.PackageManager
 import android.location.Location
 import app.camp.gladiator.client.cg.model.TrainingLocation
+import app.camp.gladiator.repository.LocationRepository
 import app.camp.gladiator.repository.Permission
 import app.camp.gladiator.repository.PermissionRepository
 import app.camp.gladiator.ui.locations.LocationsViewModel.LocationsState
@@ -31,12 +32,16 @@ class LocationsViewModelTest {
         permissionRepository: PermissionRepository = mockk(relaxUnitFun = true) {
             every { hasPermissionFor(Permission.LocationPermission()) } returns true
         },
+        locationRepository: LocationRepository = mockk(relaxUnitFun = true) {
+            every { runBlocking { lastKnownLocation() } } returns mockk(relaxed = true)
+        },
         permissionUseCase: PermissionUseCase = mockk(relaxUnitFun = true),
         campGladiatorLocationsUseCase: CampGladiatorLocationsUseCase = mockk(relaxUnitFun = true)
     ): LocationsViewModel = LocationsViewModel(
         permissionRepository,
         permissionRationale,
         permissionUseCase,
+        locationRepository,
         campGladiatorLocationsUseCase
     )
 
@@ -75,16 +80,24 @@ class LocationsViewModelTest {
     }
 
     @Test
-    fun make_init_state__require_no_permissions() {
+    fun make_init_state__require_no_permissions__includes_users_location() {
+        val usersLocation: Location = mockk {
+            every { latitude } returns 30.406991
+            every { longitude } returns -97.720310
+        }
         assertThat(
             createViewModel(
                 permissionRepository = mockk {
                     every { hasPermissionFor(Permission.LocationPermission()) } returns true
+                },
+                locationRepository = mockk {
+                    every { runBlocking { lastKnownLocation() } } returns usersLocation
                 }
             ).makeInitState()
         ).isEqualTo(
             LocationsState(
-                permissionRationale = permissionRationale
+                permissionRationale = permissionRationale,
+                userLocation = usersLocation
             )
         )
     }

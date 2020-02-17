@@ -15,8 +15,8 @@ import app.camp.gladiator.R
 import app.camp.gladiator.client.cg.model.TrainingLocation
 import app.camp.gladiator.extensions.app.asLatLng
 import app.camp.gladiator.repository.Permission
-import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -30,7 +30,8 @@ class LocationsFragment : Fragment() {
     private val locationsViewModel: LocationsViewModel by inject()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val mapFragment: SupportMapFragment get() = childFragmentManager.findFragmentByTag("map") as SupportMapFragment
+    val mapFragment: SupportMapFragment
+        get() = childFragmentManager.findFragmentByTag("map") as SupportMapFragment
 
     val stateObserver: Observer<LocationsViewModel.LocationsState> = Observer { state ->
         when {
@@ -38,10 +39,21 @@ class LocationsFragment : Fragment() {
                 state.requiredPermission,
                 state.permissionRationale
             )
-            state.locations.isEmpty() -> locationsViewModel.dispatchEvent(
-                LocationsViewModel.Events.GatherLocationsNearMe
-            )
+            else -> plotUsersLocation(state.userLocation)
+        }
+
+        when {
             state.locations.isNotEmpty() -> plotLocations(state.locations, state.userLocation)
+            else -> locationsViewModel.dispatchEvent(LocationsViewModel.Events.GatherLocationsNearMe)
+        }
+    }
+
+    private fun plotUsersLocation(usersLocation: Location?) {
+        mapFragment.getMapAsync { map ->
+            map.isMyLocationEnabled = true
+            usersLocation?.let {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(it.asLatLng(), 12F))
+            }
         }
     }
 
@@ -49,13 +61,15 @@ class LocationsFragment : Fragment() {
         mapFragment.getMapAsync { map ->
             locations.forEach { location ->
                 if (location.containValidCoordinates) {
-                    map.addMarker(MarkerOptions().position(
-                        location.asLatLng()
-                    ).title(location.name))
+                    map.addMarker(
+                        MarkerOptions().position(
+                            location.asLatLng()
+                        ).title(location.name)
+                    )
                 }
             }
 
-            usersLocation?.let {location ->
+            usersLocation?.let { location ->
                 map.isMyLocationEnabled = true
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(location.asLatLng(), 12F))
             }
