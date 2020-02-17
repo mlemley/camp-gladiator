@@ -1,6 +1,5 @@
 package app.camp.gladiator.ui.locations
 
-import android.location.Criteria
 import android.location.Location
 import app.camp.gladiator.client.cg.model.TrainingLocation
 import app.camp.gladiator.extensions.exhaustive
@@ -22,6 +21,7 @@ import kotlinx.coroutines.runBlocking
 class LocationsViewModel(
     private val permissionRepository: PermissionRepository,
     private val permissionRationale: String,
+    private val invalidSearchCriteriaErrorMessage:String,
     permissionUseCase: PermissionUseCase,
     private val locationRepository: LocationRepository,
     campGladiatorLocationsUseCase: CampGladiatorLocationsUseCase
@@ -30,14 +30,17 @@ class LocationsViewModel(
     sealed class Events : Event {
         object GatherLocationsNearMe : Events()
         data class PermissionsResponse(val permissions: Map<String, Int>) : Events()
-        data class LocationSearchNear(val searchCriteria: String):Events()
+        data class LocationSearchNear(val searchCriteria: String) : Events()
     }
 
     data class LocationsState(
         val requiredPermission: Permission? = null,
         val permissionRationale: String = "",
         val locations: List<TrainingLocation> = emptyList(),
-        val usersLocation: Location? = null
+        val usersLocation: Location? = null,
+        val errorMessage:String? = null,
+        val focusOn:Location? = null
+
     ) : State
 
     override val useCases: List<UseCase> = listOf(permissionUseCase, campGladiatorLocationsUseCase)
@@ -60,19 +63,27 @@ class LocationsViewModel(
                         it.permissions
                     )
                 )
-                is Events.LocationSearchNear -> TODO()
+                is Events.LocationSearchNear -> emit(
+                    CampGladiatorLocationsUseCase.Actions.GatherLocationsNearSearchCriteria(
+                        it.searchCriteria
+                    )
+                )
             }.exhaustive
         }
     }
 
     override fun LocationsState.plus(result: Result): LocationsState {
         return when (result) {
-            is PermissionUseCase.Results.LocationPermissionGranted -> copy(requiredPermission = null)
+            is PermissionUseCase.Results.LocationPermissionGranted -> copy(requiredPermission = null, errorMessage = null)
             is CampGladiatorLocationsUseCase.Results.LocationsGathered -> copy(
                 locations = result.locations,
-                usersLocation = result.usersLocation
+                usersLocation = result.usersLocation,
+                errorMessage = null
             )
-            else -> this
+            is CampGladiatorLocationsUseCase.Results.LocationCouldNotBeFound -> copy(
+                errorMessage = invalidSearchCriteriaErrorMessage
+            )
+            else -> this.copy(errorMessage = null)
         }
     }
 

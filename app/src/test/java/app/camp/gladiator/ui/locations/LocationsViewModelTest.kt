@@ -36,10 +36,13 @@ class LocationsViewModelTest {
             every { runBlocking { lastKnownLocation() } } returns mockk(relaxed = true)
         },
         permissionUseCase: PermissionUseCase = mockk(relaxUnitFun = true),
-        campGladiatorLocationsUseCase: CampGladiatorLocationsUseCase = mockk(relaxUnitFun = true)
+        campGladiatorLocationsUseCase: CampGladiatorLocationsUseCase = mockk(relaxUnitFun = true),
+        invalidSearchCriteriaErrorMessage: String = "Invalid Search"
+
     ): LocationsViewModel = LocationsViewModel(
         permissionRepository,
         permissionRationale,
+        invalidSearchCriteriaErrorMessage,
         permissionUseCase,
         locationRepository,
         campGladiatorLocationsUseCase
@@ -111,13 +114,16 @@ class LocationsViewModelTest {
                 PackageManager.PERMISSION_GRANTED
             )
         )
+        val searchCriteria = "things and stuff"
         val events = flowOf(
             LocationsViewModel.Events.GatherLocationsNearMe,
+            LocationsViewModel.Events.LocationSearchNear(searchCriteria),
             LocationsViewModel.Events.PermissionsResponse(permissions)
         )
 
         val expected = listOf(
             CampGladiatorLocationsUseCase.Actions.GatherLocationsNearMe,
+            CampGladiatorLocationsUseCase.Actions.GatherLocationsNearSearchCriteria(searchCriteria),
             PermissionUseCase.PermissionResponseReceived(permissions)
         )
 
@@ -162,7 +168,7 @@ class LocationsViewModelTest {
     @Test
     fun plus_merges_user_location() {
         val viewModel = createViewModel()
-        val initState = viewModel.makeInitState()
+        val initState = viewModel.makeInitState().copy(errorMessage = "invalid search")
         val usersLocation = mockk<Location>()
         val locations = listOf<TrainingLocation>(mockk())
         val results = listOf(
@@ -173,7 +179,11 @@ class LocationsViewModelTest {
         )
 
         val expectedStates = listOf(
-            initState.copy(locations = locations, usersLocation = usersLocation)
+            initState.copy(
+                locations = locations,
+                usersLocation = usersLocation,
+                errorMessage = null
+            )
         )
 
         val actualStates = mutableListOf<LocationsState>()
@@ -189,14 +199,38 @@ class LocationsViewModelTest {
     @Test
     fun plus_merges_locations_fetch_from_training_facility_lookup() {
         val viewModel = createViewModel()
-        val initState = viewModel.makeInitState().copy(usersLocation = mockk())
+        val initState =
+            viewModel.makeInitState().copy(usersLocation = mockk(), errorMessage = "invalid search")
         val locations = listOf<TrainingLocation>(mockk())
         val results = listOf(
             CampGladiatorLocationsUseCase.Results.LocationsGathered(locations = locations)
         )
 
         val expectedStates = listOf(
-            initState.copy(locations = locations, usersLocation = null)
+            initState.copy(locations = locations, usersLocation = null, errorMessage = null)
+        )
+
+        val actualStates = mutableListOf<LocationsState>()
+        with(viewModel) {
+            results.forEach {
+                actualStates.add(initState + it)
+            }
+        }
+
+        assertThat(actualStates).isEqualTo(expectedStates)
+    }
+
+    @Test
+    fun plus_adds_error_message_for_invalid_search_criteria() {
+        val errorMessage = "Invalid Search"
+        val viewModel = createViewModel(invalidSearchCriteriaErrorMessage = errorMessage)
+        val initState = viewModel.makeInitState()
+        val results = listOf(
+            CampGladiatorLocationsUseCase.Results.LocationCouldNotBeFound
+        )
+
+        val expectedStates = listOf(
+            initState.copy(errorMessage = errorMessage)
         )
 
         val actualStates = mutableListOf<LocationsState>()
