@@ -11,10 +11,5 @@ data class TrainingLocation(
     @SerializedName("placeLongitude")
     val longitude: Double
 ) {
-    val containValidCoordinates: Boolean
-        get() {
-            return latitude.isFinite() && longitude.isFinite()
-        }
-
-    fun asLatLng(): LatLng = LatLng(latitude, longitude)
+    fun toLatLng(): LatLng = LatLng(latitude, longitude)
 }

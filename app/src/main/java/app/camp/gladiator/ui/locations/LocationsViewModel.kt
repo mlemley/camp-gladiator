@@ -35,7 +35,7 @@ class LocationsViewModel(
         val requiredPermission: Permission? = null,
         val permissionRationale: String = "",
         val locations: List<TrainingLocation> = emptyList(),
-        val userLocation: Location? = null
+        val usersLocation: Location? = null
     ) : State
 
     override val useCases: List<UseCase> = listOf(permissionUseCase, campGladiatorLocationsUseCase)
@@ -45,7 +45,7 @@ class LocationsViewModel(
         LocationsState(
             requiredPermission = requiredPermission(),
             permissionRationale = permissionRationale,
-            userLocation = if (usersLocation.latitude == 0.0 || usersLocation.longitude == 0.0) null else usersLocation
+            usersLocation = if (usersLocation.latitude == 0.0 || usersLocation.longitude == 0.0) null else usersLocation
         )
     }
 
@@ -67,7 +67,7 @@ class LocationsViewModel(
             is PermissionUseCase.Results.LocationPermissionGranted -> copy(requiredPermission = null)
             is CampGladiatorLocationsUseCase.Results.LocationsGathered -> copy(
                 locations = result.locations,
-                userLocation = result.usersLocation
+                usersLocation = result.usersLocation
             )
             else -> this
         }

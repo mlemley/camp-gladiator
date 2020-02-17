@@ -8,16 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.VisibleForTesting
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import app.camp.gladiator.R
 import app.camp.gladiator.client.cg.model.TrainingLocation
-import app.camp.gladiator.extensions.app.asLatLng
 import app.camp.gladiator.repository.Permission
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.koin.android.ext.android.inject
@@ -39,40 +35,17 @@ class LocationsFragment : Fragment() {
                 state.requiredPermission,
                 state.permissionRationale
             )
-            else -> plotUsersLocation(state.userLocation)
+            else -> {
+                performMapOperation(MapOperations.EnableLocationRendering)
+                state.usersLocation?.let { location ->
+                    performMapOperation(MapOperations.CenterOn(location))
+                }
+            }
         }
 
         when {
-            state.locations.isNotEmpty() -> plotLocations(state.locations, state.userLocation)
+            state.locations.isNotEmpty() -> performMapOperation(MapOperations.PlotLocations(state.locations))
             else -> locationsViewModel.dispatchEvent(LocationsViewModel.Events.GatherLocationsNearMe)
-        }
-    }
-
-    private fun plotUsersLocation(usersLocation: Location?) {
-        mapFragment.getMapAsync { map ->
-            map.isMyLocationEnabled = true
-            usersLocation?.let {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(it.asLatLng(), 12F))
-            }
-        }
-    }
-
-    private fun plotLocations(locations: List<TrainingLocation>, usersLocation: Location?) {
-        mapFragment.getMapAsync { map ->
-            locations.forEach { location ->
-                if (location.containValidCoordinates) {
-                    map.addMarker(
-                        MarkerOptions().position(
-                            location.asLatLng()
-                        ).title(location.name)
-                    )
-                }
-            }
-
-            usersLocation?.let { location ->
-                map.isMyLocationEnabled = true
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(location.asLatLng(), 12F))
-            }
         }
     }
 
@@ -117,9 +90,13 @@ class LocationsFragment : Fragment() {
             requestPermissions(arrayOf(permission.name), permissionRequestCode)
         }
 
+    private fun performMapOperation(mapOperation: MapOperation) {
+        mapFragment.getMapAsync { map ->
+            mapOperation.operateWith(map)
+        }
+    }
+
     companion object {
         const val permissionRequestCode = 1000
     }
-
-
 }

@@ -97,7 +97,7 @@ class LocationsViewModelTest {
         ).isEqualTo(
             LocationsState(
                 permissionRationale = permissionRationale,
-                userLocation = usersLocation
+                usersLocation = usersLocation
             )
         )
     }
@@ -173,7 +173,7 @@ class LocationsViewModelTest {
         )
 
         val expectedStates = listOf(
-            initState.copy(locations = locations, userLocation = usersLocation)
+            initState.copy(locations = locations, usersLocation = usersLocation)
         )
 
         val actualStates = mutableListOf<LocationsState>()
@@ -189,14 +189,14 @@ class LocationsViewModelTest {
     @Test
     fun plus_merges_locations_fetch_from_training_facility_lookup() {
         val viewModel = createViewModel()
-        val initState = viewModel.makeInitState().copy(userLocation = mockk())
+        val initState = viewModel.makeInitState().copy(usersLocation = mockk())
         val locations = listOf<TrainingLocation>(mockk())
         val results = listOf(
             CampGladiatorLocationsUseCase.Results.LocationsGathered(locations = locations)
         )
 
         val expectedStates = listOf(
-            initState.copy(locations = locations, userLocation = null)
+            initState.copy(locations = locations, usersLocation = null)
         )
 
         val actualStates = mutableListOf<LocationsState>()
