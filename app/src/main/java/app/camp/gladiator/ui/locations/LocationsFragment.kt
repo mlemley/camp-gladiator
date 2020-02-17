@@ -97,7 +97,6 @@ class LocationsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_locations, container, false)
-        (activity as AppCompatActivity).supportActionBar?.hide()
         locationsViewModel.state.observe(viewLifecycleOwner, stateObserver)
         return view
     }

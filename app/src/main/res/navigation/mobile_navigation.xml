@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/nav_locations">
     <activity
         android:id="@+id/nav_main"
         android:name="app.camp.gladiator.ui.home.HomeActivity"
         />
 
     <fragment
-        android:id="@+id/nav_home"
+        android:id="@+id/nav_locations"
         android:name="app.camp.gladiator.ui.locations.LocationsFragment"
         android:label="@string/title_locations"
         tools:layout="@layout/fragment_locations" />

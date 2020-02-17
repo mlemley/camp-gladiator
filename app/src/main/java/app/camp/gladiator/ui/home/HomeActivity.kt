@@ -3,6 +3,8 @@ package app.camp.gladiator.ui.home
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -24,9 +26,15 @@ class HomeActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home
+                R.id.nav_locations
             ), drawerLayout
         )
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.nav_locations -> supportActionBar?.hide()
+                else -> supportActionBar?.show()
+            }
+        }
         setupActionBarWithNavController(navController, appBarConfiguration)
         withView<NavigationView>(R.id.navigation).setupWithNavController(navController)
     }
