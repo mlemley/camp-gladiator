@@ -6,12 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import app.camp.gladiator.R
 import app.camp.gladiator.repository.Permission
-import com.google.android.gms.maps.GoogleMap
+import app.lemley.crypscape.extensions.app.withView
 import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -23,9 +24,10 @@ import org.koin.android.ext.android.inject
 class LocationsFragment : Fragment() {
 
     private val locationsViewModel: LocationsViewModel by inject()
+    val searchView: SearchView? get() = withView(R.id.location_search)
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val mapFragment: SupportMapFragment
+    val mapFragment: SupportMapFragment?
         get() = childFragmentManager.findFragmentByTag("map") as SupportMapFragment
 
     val stateObserver: Observer<LocationsViewModel.LocationsState> = Observer { state ->
@@ -48,8 +50,13 @@ class LocationsFragment : Fragment() {
         }
     }
 
-    val onCameraMoveListener = GoogleMap.OnCameraMoveListener {
+    val searchQueryObserver = object : SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(query: String?): Boolean = query?.let {
+            locationsViewModel.dispatchEvent(LocationsViewModel.Events.LocationSearchNear(query))
+            return true
+        } ?: false
 
+        override fun onQueryTextChange(newText: String?): Boolean = false
     }
 
     override fun onCreateView(
@@ -60,6 +67,16 @@ class LocationsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_locations, container, false)
         locationsViewModel.state.observe(viewLifecycleOwner, stateObserver)
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        searchView?.setOnQueryTextListener(searchQueryObserver)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        searchView?.setOnQueryTextListener(null)
     }
 
     // TODO: pull up into base class when permissions count are > 1
@@ -96,7 +113,7 @@ class LocationsFragment : Fragment() {
         }
 
     private fun performMapOperation(mapOperation: MapOperation) {
-        mapFragment.getMapAsync { map ->
+        mapFragment?.getMapAsync { map ->
             mapOperation.operateWith(map)
         }
     }

@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:tag="map"
-        tools:context=".MapsActivity" />
+        tools:context=".ui.welcome.WelcomeActivity" />
 
     <SearchView
         android:id="@+id/location_search"
@@ -19,21 +19,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/background_map_search"
-        android:queryHint="@string/search_for_locations"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/map" />
 
-    <Button
-        android:id="@+id/search_here"
-        style="@style/Button.SearchHere"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/search_this_area"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/location_search" />
 </androidx.constraintlayout.widget.ConstraintLayout>

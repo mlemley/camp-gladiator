@@ -32,7 +32,7 @@ class LocationRepositoryTest {
 
     @Test
     fun provides_access_to_last_known_location() {
-        val location = Location(LocationManager.GPS_PROVIDER).apply {
+        val location = Location(LocationManager.PASSIVE_PROVIDER).apply {
             latitude = 30.377416
             longitude = -97.732010
         }

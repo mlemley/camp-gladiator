@@ -9,6 +9,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import org.apache.tools.ant.Location
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.android.viewmodel.dsl.viewModel
@@ -56,6 +57,22 @@ class LocationsFragmentTest {
 
             verify {
                 viewModel.dispatchEvent(LocationsViewModel.Events.GatherLocationsNearMe)
+            }
+        }
+    }
+
+
+    @Test
+    fun sets_search_query_observer_on_search_view() {
+        val viewModel: LocationsViewModel = mockk(relaxUnitFun = true) {
+            every { state } returns mockk(relaxUnitFun = true)
+        }
+        createScenario(locationsViewModel = viewModel).onFragment { fragment ->
+            val searchCriteria = "Things and Stuff"
+            fragment.searchView!!.setQuery(searchCriteria, true)
+
+            verify {
+                viewModel.dispatchEvent(LocationsViewModel.Events.LocationSearchNear(searchCriteria))
             }
         }
     }

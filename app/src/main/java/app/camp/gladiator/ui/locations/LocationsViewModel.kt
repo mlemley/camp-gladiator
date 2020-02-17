@@ -1,5 +1,6 @@
 package app.camp.gladiator.ui.locations
 
+import android.location.Criteria
 import android.location.Location
 import app.camp.gladiator.client.cg.model.TrainingLocation
 import app.camp.gladiator.extensions.exhaustive
@@ -19,16 +20,17 @@ import kotlinx.coroutines.runBlocking
 @FlowPreview
 @ExperimentalCoroutinesApi
 class LocationsViewModel(
-    val permissionRepository: PermissionRepository,
-    val permissionRationale: String,
+    private val permissionRepository: PermissionRepository,
+    private val permissionRationale: String,
     permissionUseCase: PermissionUseCase,
-    val locationRepository: LocationRepository,
+    private val locationRepository: LocationRepository,
     campGladiatorLocationsUseCase: CampGladiatorLocationsUseCase
 ) :
     BaseViewModel<LocationsViewModel.Events, LocationsViewModel.LocationsState>() {
     sealed class Events : Event {
         object GatherLocationsNearMe : Events()
         data class PermissionsResponse(val permissions: Map<String, Int>) : Events()
+        data class LocationSearchNear(val searchCriteria: String):Events()
     }
 
     data class LocationsState(
@@ -58,6 +60,7 @@ class LocationsViewModel(
                         it.permissions
                     )
                 )
+                is Events.LocationSearchNear -> TODO()
             }.exhaustive
         }
     }
