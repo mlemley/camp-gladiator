@@ -36,7 +36,8 @@ class CampGladiatorLocationsUseCase(
         object LocationCouldNotBeFound : Results()
         data class LocationsGathered(
             val locations: List<TrainingLocation>,
-            val usersLocation: Location? = null
+            val usersLocation: Location? = null,
+            val focalPoint: Location? = null
         ) : Results()
     }
 
@@ -60,7 +61,8 @@ class CampGladiatorLocationsUseCase(
                         Results.LocationsGathered(
                             trainingLocationsRepository.trainingFacilitiesNear(
                                 location
-                            )
+                            ),
+                            focalPoint = location
                         )
                     )
                 }
@@ -74,7 +76,8 @@ class CampGladiatorLocationsUseCase(
             Results.LocationsGathered(
                 trainingLocationsRepository.trainingFacilitiesNear(
                     location
-                )
+                ),
+                focalPoint = location
             )
         )
     }.flowOn(Dispatchers.IO)
@@ -87,7 +90,8 @@ class CampGladiatorLocationsUseCase(
                 trainingLocationsRepository.trainingFacilitiesNear(
                     location
                 ),
-                location
+                usersLocation = location,
+                focalPoint = location
             )
         )
     }.flowOn(Dispatchers.IO)

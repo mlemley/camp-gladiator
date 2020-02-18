@@ -78,6 +78,7 @@ class LocationsViewModel(
             is CampGladiatorLocationsUseCase.Results.LocationsGathered -> copy(
                 locations = result.locations,
                 usersLocation = result.usersLocation,
+                focusOn = result.focalPoint,
                 errorMessage = null
             )
             is CampGladiatorLocationsUseCase.Results.LocationCouldNotBeFound -> copy(

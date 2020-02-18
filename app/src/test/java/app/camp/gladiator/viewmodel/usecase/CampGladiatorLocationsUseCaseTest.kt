@@ -60,7 +60,7 @@ class CampGladiatorLocationsUseCaseTest {
         runBlocking {
             val results = useCase.handleAction(Actions.GatherLocationsNearMe).toList()
             assertThat(results[0]).isEqualTo(Results.LocationsLoading)
-            assertThat(results[1]).isEqualTo(Results.LocationsGathered(trainingLocations, location))
+            assertThat(results[1]).isEqualTo(Results.LocationsGathered(trainingLocations, usersLocation = location, focalPoint = location))
         }
     }
 
@@ -79,7 +79,7 @@ class CampGladiatorLocationsUseCaseTest {
                 useCase.handleAction(Actions.GatherLocationsNearLocation(location))
                     .toList()
             assertThat(results[0]).isEqualTo(Results.LocationsLoading)
-            assertThat(results[1]).isEqualTo(Results.LocationsGathered(trainingLocations))
+            assertThat(results[1]).isEqualTo(Results.LocationsGathered(trainingLocations, focalPoint = location))
         }
     }
 
@@ -110,7 +110,7 @@ class CampGladiatorLocationsUseCaseTest {
                 useCase.handleAction(Actions.GatherLocationsNearSearchCriteria(searchCriteria))
                     .toList()
             assertThat(results[0]).isEqualTo(Results.LocationsLoading)
-            assertThat(results[1]).isEqualTo(Results.LocationsGathered(trainingLocations))
+            assertThat(results[1]).isEqualTo(Results.LocationsGathered(trainingLocations, focalPoint = location))
         }
     }
 
