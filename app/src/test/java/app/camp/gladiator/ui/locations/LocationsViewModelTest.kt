@@ -2,6 +2,7 @@ package app.camp.gladiator.ui.locations
 
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import app.camp.gladiator.client.cg.model.TrainingLocation
 import app.camp.gladiator.repository.LocationRepository
 import app.camp.gladiator.repository.Permission
@@ -151,7 +152,14 @@ class LocationsViewModelTest {
             every { hasPermissionFor(Permission.LocationPermission) } returns false
         }
 
-        val viewModel = createViewModel(permissionRepository = permissionRepository)
+        val usersLocation = mockk<Location>()
+        val locationRepository: LocationRepository = mockk(relaxUnitFun = true) {
+            every { runBlocking { lastKnownLocation() }} returns Location(LocationManager.PASSIVE_PROVIDER) andThen usersLocation
+        }
+        val viewModel = createViewModel(
+            permissionRepository = permissionRepository,
+            locationRepository = locationRepository
+        )
         val initState = viewModel.makeInitState()
         val results = listOf(
             PermissionUseCase.Results.PermissionRequestAcknowledged(Permission.LocationPermission),
@@ -179,7 +187,8 @@ class LocationsViewModelTest {
                     requiredPermission = null,
                     permissionRationale = permissionRationale,
                     permissionCollectionState = PermissionCollectionState.Collected
-                )
+                ),
+                usersLocation = usersLocation
             )
         )
 

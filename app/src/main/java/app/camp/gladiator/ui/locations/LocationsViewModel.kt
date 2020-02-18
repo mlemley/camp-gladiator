@@ -112,7 +112,8 @@ class LocationsViewModel(
                 this.permissionState.copy(
                     requiredPermission = null,
                     permissionCollectionState = PermissionCollectionState.Collected
-                )
+                    ),
+                usersLocation = runBlocking { locationRepository.lastKnownLocation() }
             )
             is PermissionUseCase.Results.LocationPermissionDenied -> copy(
                 this.permissionState.copy(

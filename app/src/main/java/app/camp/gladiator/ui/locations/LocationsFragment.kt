@@ -164,9 +164,9 @@ class LocationsFragment : BaseFragment() {
                             dialogInterface.dismiss()
                         }
                         .setNegativeButton(getString(R.string.keep_disabled)) { dialogInterface: DialogInterface, i: Int ->
-                            LocationsViewModel.Events.PermissionsResponse(
+                            locationsViewModel.dispatchEvent(LocationsViewModel.Events.PermissionsResponse(
                                 mapOf(Pair(permission.name, PackageManager.PERMISSION_DENIED))
-                            )
+                            ))
                             dialogInterface.dismiss()
                         }
                         .show()
