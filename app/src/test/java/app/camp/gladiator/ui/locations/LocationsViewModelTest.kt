@@ -30,7 +30,7 @@ class LocationsViewModelTest {
 
     private fun createViewModel(
         permissionRepository: PermissionRepository = mockk(relaxUnitFun = true) {
-            every { hasPermissionFor(Permission.LocationPermission()) } returns true
+            every { hasPermissionFor(Permission.LocationPermission) } returns true
         },
         locationRepository: LocationRepository = mockk(relaxUnitFun = true) {
             every { runBlocking { lastKnownLocation() } } returns mockk(relaxed = true)
@@ -71,12 +71,12 @@ class LocationsViewModelTest {
         assertThat(
             createViewModel(
                 permissionRepository = mockk {
-                    every { hasPermissionFor(Permission.LocationPermission()) } returns false
+                    every { hasPermissionFor(Permission.LocationPermission) } returns false
                 }
             ).makeInitState()
         ).isEqualTo(
             LocationsState(
-                requiredPermission = Permission.LocationPermission(),
+                requiredPermission = Permission.LocationPermission,
                 permissionRationale = permissionRationale
             )
         )
@@ -91,7 +91,7 @@ class LocationsViewModelTest {
         assertThat(
             createViewModel(
                 permissionRepository = mockk {
-                    every { hasPermissionFor(Permission.LocationPermission()) } returns true
+                    every { hasPermissionFor(Permission.LocationPermission) } returns true
                 },
                 locationRepository = mockk {
                     every { runBlocking { lastKnownLocation() } } returns usersLocation
@@ -110,7 +110,7 @@ class LocationsViewModelTest {
         val viewModel = createViewModel()
         val permissions = mapOf<String, Int>(
             Pair(
-                Permission.LocationPermission().name,
+                Permission.LocationPermission.name,
                 PackageManager.PERMISSION_GRANTED
             )
         )
@@ -138,9 +138,9 @@ class LocationsViewModelTest {
     }
 
     @Test
-    fun plus_zeros_permission__when_location_access_granted() {
+    fun plus_zeros_permission__when_location_access_granted_or_denied() {
         val permissionRepository: PermissionRepository = mockk {
-            every { hasPermissionFor(Permission.LocationPermission()) } returns false
+            every { hasPermissionFor(Permission.LocationPermission) } returns false
         }
 
         val viewModel = createViewModel(permissionRepository = permissionRepository)
@@ -151,8 +151,8 @@ class LocationsViewModelTest {
         )
 
         val expectedStates = listOf(
-            initState,
-            initState.copy(requiredPermission = null)
+            initState.copy(requiredPermission = Permission.LocationPermission, permissionCollected = true),
+            initState.copy(requiredPermission = null, permissionCollected = true)
         )
 
         val actualStates = mutableListOf<LocationsState>()
@@ -164,6 +164,7 @@ class LocationsViewModelTest {
 
         assertThat(actualStates).isEqualTo(expectedStates)
     }
+
 
     @Test
     fun plus_merges_user_location() {

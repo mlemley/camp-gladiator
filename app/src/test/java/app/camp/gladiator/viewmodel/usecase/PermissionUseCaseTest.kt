@@ -5,10 +5,12 @@ import app.camp.gladiator.repository.Permission
 import app.camp.gladiator.viewmodel.Action
 import app.camp.gladiator.viewmodel.usecase.PermissionUseCase.Results
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class PermissionUseCaseTest {
 
     private fun createUseCase(): PermissionUseCase = PermissionUseCase()
@@ -28,7 +30,7 @@ class PermissionUseCaseTest {
             createUseCase().handleAction(
                 PermissionUseCase.PermissionResponseReceived(
                     mapOf(
-                        Pair(Permission.LocationPermission().name, PackageManager.PERMISSION_GRANTED)
+                        Pair(Permission.LocationPermission.name, PackageManager.PERMISSION_GRANTED)
                     )
                 )
             ).collect { result ->
@@ -47,7 +49,7 @@ class PermissionUseCaseTest {
             createUseCase().handleAction(
                 PermissionUseCase.PermissionResponseReceived(
                     mapOf(
-                        Pair(Permission.LocationPermission().name, PackageManager.PERMISSION_DENIED)
+                        Pair(Permission.LocationPermission.name, PackageManager.PERMISSION_DENIED)
                     )
                 )
             ).collect { result ->

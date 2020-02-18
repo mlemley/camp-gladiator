@@ -34,9 +34,9 @@ class PermissionUseCase : UseCase {
         channelFlow<Result> {
             permissions.forEach { (permissionName, result) ->
                 when {
-                    permissionName == Permission.LocationPermission().name &&
+                    permissionName == Permission.LocationPermission.name &&
                             result == PackageManager.PERMISSION_GRANTED -> send(Results.LocationPermissionGranted)
-                    permissionName == Permission.LocationPermission().name &&
+                    permissionName == Permission.LocationPermission.name &&
                             result == PackageManager.PERMISSION_DENIED -> send(Results.LocationPermissionDenied)
                 }
             }

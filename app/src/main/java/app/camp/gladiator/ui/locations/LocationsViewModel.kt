@@ -35,6 +35,7 @@ class LocationsViewModel(
 
     data class LocationsState(
         val requiredPermission: Permission? = null,
+        val permissionCollected: Boolean = false,
         val permissionRationale: String = "",
         val locations: List<TrainingLocation> = emptyList(),
         val usersLocation: Location? = null,
@@ -77,7 +78,12 @@ class LocationsViewModel(
             is PermissionUseCase.Results.LocationPermissionGranted -> copy(
                 requiredPermission = null,
                 errorMessage = null,
-                isSearching = false
+                isSearching = false,
+                permissionCollected = true
+            )
+
+            is PermissionUseCase.Results.LocationPermissionDenied -> copy(
+                permissionCollected = true
             )
             is CampGladiatorLocationsUseCase.Results.LocationsGathered -> copy(
                 locations = result.locations,
@@ -98,8 +104,8 @@ class LocationsViewModel(
     }
 
     private fun requiredPermission(): Permission? {
-        return if (permissionRepository.hasPermissionFor(Permission.LocationPermission())) null
-        else Permission.LocationPermission()
+        return if (permissionRepository.hasPermissionFor(Permission.LocationPermission)) null
+        else Permission.LocationPermission
     }
 
 }

@@ -23,7 +23,7 @@ class LocationRepositoryTest {
 
     private fun createRepository(
         permissionRepository: PermissionRepository = mockk {
-            every { hasPermissionFor(Permission.LocationPermission()) } returns true
+            every { hasPermissionFor(Permission.LocationPermission) } returns true
         }
     ): LocationRepository = LocationRepository(
         ApplicationProvider.getApplicationContext<TestCampGladiatorApplication>().locationManager,

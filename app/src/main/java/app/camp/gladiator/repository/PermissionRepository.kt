@@ -7,19 +7,22 @@ import androidx.core.content.ContextCompat
 
 
 interface IPermission {
-    val name:String
+    val name: String
 }
 
-sealed class Permission: IPermission {
+sealed class Permission : IPermission {
 
-    data class LocationPermission(
+    object LocationPermission : Permission() {
         override val name: String = Manifest.permission.ACCESS_FINE_LOCATION
-    ) : Permission()
+    }
 }
 
 class PermissionRepository constructor(private val context: Context) {
 
     fun hasPermissionFor(permission: Permission): Boolean {
-        return ContextCompat.checkSelfPermission(context, permission.name) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(
+            context,
+            permission.name
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }
