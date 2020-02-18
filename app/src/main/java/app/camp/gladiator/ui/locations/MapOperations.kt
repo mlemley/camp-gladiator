@@ -3,6 +3,7 @@ package app.camp.gladiator.ui.locations
 import android.location.Location
 import app.camp.gladiator.client.cg.model.TrainingLocation
 import app.camp.gladiator.extensions.app.toLatLng
+import app.camp.gladiator.extensions.clearPins
 import app.camp.gladiator.extensions.moveCameraTo
 import app.camp.gladiator.extensions.plot
 import com.google.android.gms.maps.GoogleMap
@@ -27,6 +28,7 @@ sealed class MapOperations : MapOperation {
 
     class PlotLocations(val locations: List<TrainingLocation>) : MapOperations() {
         override fun operateWith(map: GoogleMap) {
+            map.clearPins()
             locations.forEach { location ->
                 map.plot(location.toLatLng(), location.name)
             }
