@@ -12,6 +12,7 @@ In order for google maps to work follow the steps to [obtain an API token](https
 
 Ensure the following:
 1) [Map Api Support is enabled](https://console.cloud.google.com/apis/library/maps-android-backend.googleapis.com)
+1) [Map GeoCode Api is enabled](https://console.cloud.google.com/marketplace/details/google/geocoding-backend.googleapis.com)
 2) [Api Key has been created](https://console.cloud.google.com/apis/credentials)
 3) [Downloaded SDK Tools](https://developer.android.com/studio/intro/update.html#sdk-manager)
 

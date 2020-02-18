@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object GoogleApiFactory {
-    private const val apiBaseUrl = "https://www.googleapis.com/"
+    private const val apiBaseUrl = "https://maps.googleapis.com/"
 
     private val client = OkHttpClient().newBuilder()
         // add interceptors here

@@ -50,7 +50,7 @@ class GoogleApiClientTest {
         val recordedRequest = mockWebServer.takeRequest(100, TimeUnit.NANOSECONDS)!!
 
         assertThat(recordedRequest.path).isEqualTo(
-            "/maps/api/geocode/json?apiKey=--api-key--&address=Things%20and%20stuff"
+            "/maps/api/geocode/json?key=--api-key--&address=Things%20and%20stuff"
         )
         val expectedLocation: Location = Location(LocationManager.PASSIVE_PROVIDER).apply {
             latitude = 40.7142484

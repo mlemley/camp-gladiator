@@ -10,5 +10,5 @@ import retrofit2.http.Query
 interface GoogleApi {
 
     @GET("/maps/api/geocode/json")
-    fun geoCodeAsync(@Query("apiKey") apiKey: String, @Query("address") address: String): Deferred<Response<GeoCodeResponse>>
+    fun geoCodeAsync(@Query("key") apiKey: String, @Query("address") address: String): Deferred<Response<GeoCodeResponse>>
 }
