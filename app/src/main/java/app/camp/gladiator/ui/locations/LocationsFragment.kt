@@ -10,6 +10,7 @@ import android.widget.SearchView
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import app.camp.gladiator.R
+import app.camp.gladiator.extensions.app.toLatLng
 import app.camp.gladiator.repository.Permission
 import app.camp.gladiator.ui.base.BaseFragment
 import app.lemley.crypscape.extensions.app.withView
@@ -24,12 +25,16 @@ import org.koin.android.ext.android.inject
 class LocationsFragment : BaseFragment() {
 
     private val locationsViewModel: LocationsViewModel by inject()
+    private val mapController: MapController by inject()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val searchView: SearchView? get() = withView(R.id.location_search)
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val mapFragment: SupportMapFragment?
         get() = childFragmentManager.findFragmentByTag("map") as SupportMapFragment
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val stateObserver: Observer<LocationsViewModel.LocationsState> = Observer { state ->
         when {
             state.requiredPermission != null -> requestPermissionsFor(
@@ -37,21 +42,37 @@ class LocationsFragment : BaseFragment() {
                 state.permissionRationale
             )
             else -> {
-                performMapOperation(MapOperations.EnableLocationRendering)
-                state.usersLocation?.let { location ->
-                    performMapOperation(MapOperations.CenterOn(location))
+                mapFragment?.let { fragment ->
+                    mapController.performMapOperation(fragment, MapOperations.EnableLocationRendering)
+                    state.usersLocation?.let { location ->
+                        mapController.performMapOperation(fragment, MapOperations.CenterOn(location.toLatLng()))
+                    }
                 }
             }
         }
 
         when {
-            state.locations.isNotEmpty() -> performMapOperation(MapOperations.PlotLocations(state.locations))
+            state.locations.isNotEmpty() -> mapFragment?.let {
+                mapController.performMapOperation(
+                    it,
+                    MapOperations.PlotLocations(state.locations)
+                )
+            }
             else -> locationsViewModel.dispatchEvent(LocationsViewModel.Events.GatherLocationsNearMe)
         }
 
         state.errorMessage?.let { showMessage(it) }
+        state.focusOn?.let { focalPoint ->
+            mapFragment?.let {
+                mapController.performMapOperation(
+                    it,
+                    MapOperations.CenterOn(focalPoint.toLatLng())
+                )
+            }
+        }
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val searchQueryObserver = object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean = query?.let {
             locationsViewModel.dispatchEvent(LocationsViewModel.Events.LocationSearchNear(query))
@@ -114,11 +135,6 @@ class LocationsFragment : BaseFragment() {
             requestPermissions(arrayOf(permission.name), permissionRequestCode)
         }
 
-    private fun performMapOperation(mapOperation: MapOperation) {
-        mapFragment?.getMapAsync { map ->
-            mapOperation.operateWith(map)
-        }
-    }
 
     companion object {
         const val permissionRequestCode = 1000

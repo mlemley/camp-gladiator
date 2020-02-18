@@ -7,6 +7,7 @@ import app.camp.gladiator.extensions.clearPins
 import app.camp.gladiator.extensions.moveCameraTo
 import app.camp.gladiator.extensions.plot
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.LatLng
 
 
 interface MapOperation {
@@ -20,9 +21,9 @@ sealed class MapOperations : MapOperation {
         }
     }
 
-    class CenterOn(val location: Location) : MapOperations() {
+    class CenterOn(val focalPoint: LatLng) : MapOperations() {
         override fun operateWith(map: GoogleMap) {
-            map.moveCameraTo(location.toLatLng())
+            map.moveCameraTo(focalPoint)
         }
     }
 

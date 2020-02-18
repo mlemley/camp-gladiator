@@ -35,12 +35,9 @@ class MapOperationsTest {
     @Test
     fun centers_on_location() {
         val map = mockk<GoogleMap>(relaxUnitFun = true)
-        val location = Location(LocationManager.PASSIVE_PROVIDER).apply {
-            latitude = 87.0
-            longitude = -79.0
-        }
+        val focalPoint = LatLng(30.406991, -97.720310)
 
-        MapOperations.CenterOn(location).operateWith(map)
+        MapOperations.CenterOn(focalPoint).operateWith(map)
 
         verify {
             map.moveCameraTo(LatLng(87.0, -79.0))
