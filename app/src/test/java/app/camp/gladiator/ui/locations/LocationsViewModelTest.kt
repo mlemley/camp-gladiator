@@ -174,7 +174,8 @@ class LocationsViewModelTest {
         val results = listOf(
             CampGladiatorLocationsUseCase.Results.LocationsGathered(
                 locations = locations,
-                usersLocation = usersLocation
+                usersLocation = usersLocation,
+                focalPoint = usersLocation
             )
         )
 
@@ -182,7 +183,8 @@ class LocationsViewModelTest {
             initState.copy(
                 locations = locations,
                 usersLocation = usersLocation,
-                errorMessage = null
+                errorMessage = null,
+                focusOn = usersLocation
             )
         )
 
@@ -202,12 +204,13 @@ class LocationsViewModelTest {
         val initState =
             viewModel.makeInitState().copy(usersLocation = mockk(), errorMessage = "invalid search")
         val locations = listOf<TrainingLocation>(mockk())
+        val focalPoint:Location = mockk()
         val results = listOf(
-            CampGladiatorLocationsUseCase.Results.LocationsGathered(locations = locations)
+            CampGladiatorLocationsUseCase.Results.LocationsGathered(locations = locations, focalPoint = focalPoint)
         )
 
         val expectedStates = listOf(
-            initState.copy(locations = locations, usersLocation = null, errorMessage = null)
+            initState.copy(locations = locations, usersLocation = null, errorMessage = null, focusOn = focalPoint)
         )
 
         val actualStates = mutableListOf<LocationsState>()
