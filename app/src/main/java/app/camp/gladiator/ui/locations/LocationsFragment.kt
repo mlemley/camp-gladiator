@@ -69,13 +69,17 @@ class LocationsFragment : BaseFragment() {
                     MapOperations.CenterOn(focalPoint.toLatLng())
                 )
             }
+
+            focusOffOfSearch()
         }
     }
+
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val searchQueryObserver = object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean = query?.let {
             locationsViewModel.dispatchEvent(LocationsViewModel.Events.LocationSearchNear(query))
+            focusOffOfSearch()
             return true
         } ?: false
 
@@ -135,6 +139,7 @@ class LocationsFragment : BaseFragment() {
             requestPermissions(arrayOf(permission.name), permissionRequestCode)
         }
 
+    private fun focusOffOfSearch() = searchView?.clearFocus()
 
     companion object {
         const val permissionRequestCode = 1000
