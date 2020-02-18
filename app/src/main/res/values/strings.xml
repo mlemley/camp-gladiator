@@ -11,5 +11,6 @@
     <string name="search_for_locations">Search for locations</string>
     <string name="search_this_area">Search this area</string>
     <string name="invalid_location_search_error_message">The location you searched for could not be found.</string>
+    <string name="ok">ok</string>
 
 </resources>

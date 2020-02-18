@@ -8,10 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.annotation.VisibleForTesting
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import app.camp.gladiator.R
 import app.camp.gladiator.repository.Permission
+import app.camp.gladiator.ui.base.BaseFragment
 import app.lemley.crypscape.extensions.app.withView
 import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +21,7 @@ import org.koin.android.ext.android.inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class LocationsFragment : Fragment() {
+class LocationsFragment : BaseFragment() {
 
     private val locationsViewModel: LocationsViewModel by inject()
     val searchView: SearchView? get() = withView(R.id.location_search)
@@ -48,6 +48,8 @@ class LocationsFragment : Fragment() {
             state.locations.isNotEmpty() -> performMapOperation(MapOperations.PlotLocations(state.locations))
             else -> locationsViewModel.dispatchEvent(LocationsViewModel.Events.GatherLocationsNearMe)
         }
+
+        state.errorMessage?.let { showMessage(it) }
     }
 
     val searchQueryObserver = object : SearchView.OnQueryTextListener {

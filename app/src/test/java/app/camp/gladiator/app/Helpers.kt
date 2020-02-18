@@ -2,6 +2,7 @@ package app.camp.gladiator.app
 
 import android.location.Location
 import androidx.test.core.app.ApplicationProvider
+import app.camp.gladiator.R
 import app.camp.gladiator.extensions.app.locationManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -15,6 +16,9 @@ import org.robolectric.Shadows.shadowOf
 @FlowPreview
 @ExperimentalCoroutinesApi
 object Helpers {
+
+    val themeId:Int = R.style.CampGladiator
+
     fun loadModules(vararg modules: Module) {
         ApplicationProvider.getApplicationContext<TestCampGladiatorApplication>().also {
             loadKoinModules(
