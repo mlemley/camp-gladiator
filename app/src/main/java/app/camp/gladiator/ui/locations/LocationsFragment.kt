@@ -6,11 +6,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.SearchView
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import app.camp.gladiator.R
+import app.camp.gladiator.extensions.app.gone
+import app.camp.gladiator.extensions.app.show
 import app.camp.gladiator.extensions.app.toLatLng
+import app.camp.gladiator.extensions.exhaustive
 import app.camp.gladiator.repository.Permission
 import app.camp.gladiator.ui.base.BaseFragment
 import app.lemley.crypscape.extensions.app.withView
@@ -28,7 +32,12 @@ class LocationsFragment : BaseFragment() {
     private val mapController: MapController by inject()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val searchView: SearchView? get() = withView(R.id.location_search)
+    val searchView: SearchView?
+        get() = withView(R.id.location_search)
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val searchProgressIndicator: ProgressBar?
+        get() = withView(R.id.search_progress_indicator)
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val mapFragment: SupportMapFragment?
@@ -43,9 +52,15 @@ class LocationsFragment : BaseFragment() {
             )
             else -> {
                 mapFragment?.let { fragment ->
-                    mapController.performMapOperation(fragment, MapOperations.EnableLocationRendering)
+                    mapController.performMapOperation(
+                        fragment,
+                        MapOperations.EnableLocationRendering
+                    )
                     state.usersLocation?.let { location ->
-                        mapController.performMapOperation(fragment, MapOperations.CenterOn(location.toLatLng()))
+                        mapController.performMapOperation(
+                            fragment,
+                            MapOperations.CenterOn(location.toLatLng())
+                        )
                     }
                 }
             }
@@ -58,6 +73,7 @@ class LocationsFragment : BaseFragment() {
                     MapOperations.PlotLocations(state.locations)
                 )
             }
+            state.locations.isEmpty() && state.focusOn != null -> {}
             else -> locationsViewModel.dispatchEvent(LocationsViewModel.Events.GatherLocationsNearMe)
         }
 
@@ -72,6 +88,11 @@ class LocationsFragment : BaseFragment() {
 
             focusOffOfSearch()
         }
+
+        when (state.isSearching) {
+            true -> searchProgressIndicator?.show()
+            false -> searchProgressIndicator?.gone()
+        }.exhaustive
     }
 
 

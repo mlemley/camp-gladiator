@@ -1,6 +1,7 @@
 package app.camp.gladiator.ui.locations
 
 import android.location.Location
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.testing.FragmentScenario
@@ -126,6 +127,22 @@ class LocationsFragmentTest {
             verify {
                 mapController.performMapOperation(any(), MapOperations.CenterOn(focalPoint))
             }
+        }
+    }
+
+    @Test
+    fun renders_searching_loader_when_searching() {
+        createScenario().onFragment { fragment ->
+            val initialState = LocationsViewModel.LocationsState()
+
+            fragment.stateObserver.onChanged(initialState)
+            assertThat(fragment.searchProgressIndicator?.visibility).isEqualTo(View.GONE)
+
+            fragment.stateObserver.onChanged(initialState.copy(isSearching = true))
+            assertThat(fragment.searchProgressIndicator?.visibility).isEqualTo(View.VISIBLE)
+
+            fragment.stateObserver.onChanged(initialState.copy(isSearching = false))
+            assertThat(fragment.searchProgressIndicator?.visibility).isEqualTo(View.GONE)
         }
     }
 }
