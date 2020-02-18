@@ -21,7 +21,7 @@ import kotlinx.coroutines.runBlocking
 class LocationsViewModel(
     private val permissionRepository: PermissionRepository,
     private val permissionRationale: String,
-    private val invalidSearchCriteriaErrorMessage:String,
+    private val invalidSearchCriteriaErrorMessage: String,
     permissionUseCase: PermissionUseCase,
     private val locationRepository: LocationRepository,
     campGladiatorLocationsUseCase: CampGladiatorLocationsUseCase
@@ -38,9 +38,9 @@ class LocationsViewModel(
         val permissionRationale: String = "",
         val locations: List<TrainingLocation> = emptyList(),
         val usersLocation: Location? = null,
-        val errorMessage:String? = null,
-        val focusOn:Location? = null
-
+        val errorMessage: String? = null,
+        val focusOn: Location? = null,
+        val isSearching: Boolean = false
     ) : State
 
     override val useCases: List<UseCase> = listOf(permissionUseCase, campGladiatorLocationsUseCase)
@@ -74,17 +74,26 @@ class LocationsViewModel(
 
     override fun LocationsState.plus(result: Result): LocationsState {
         return when (result) {
-            is PermissionUseCase.Results.LocationPermissionGranted -> copy(requiredPermission = null, errorMessage = null)
+            is PermissionUseCase.Results.LocationPermissionGranted -> copy(
+                requiredPermission = null,
+                errorMessage = null,
+                isSearching = false
+            )
             is CampGladiatorLocationsUseCase.Results.LocationsGathered -> copy(
                 locations = result.locations,
                 usersLocation = result.usersLocation,
                 focusOn = result.focalPoint,
-                errorMessage = null
+                errorMessage = null,
+                isSearching = false
             )
             is CampGladiatorLocationsUseCase.Results.LocationCouldNotBeFound -> copy(
-                errorMessage = invalidSearchCriteriaErrorMessage
+                errorMessage = invalidSearchCriteriaErrorMessage,
+                isSearching = false
             )
-            else -> this.copy(errorMessage = null)
+            is CampGladiatorLocationsUseCase.Results.LocationsLoading -> copy(
+                isSearching = true
+            )
+            else -> this.copy(errorMessage = null, isSearching = false)
         }
     }
 

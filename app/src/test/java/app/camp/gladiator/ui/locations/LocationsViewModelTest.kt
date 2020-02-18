@@ -204,13 +204,21 @@ class LocationsViewModelTest {
         val initState =
             viewModel.makeInitState().copy(usersLocation = mockk(), errorMessage = "invalid search")
         val locations = listOf<TrainingLocation>(mockk())
-        val focalPoint:Location = mockk()
+        val focalPoint: Location = mockk()
         val results = listOf(
-            CampGladiatorLocationsUseCase.Results.LocationsGathered(locations = locations, focalPoint = focalPoint)
+            CampGladiatorLocationsUseCase.Results.LocationsGathered(
+                locations = locations,
+                focalPoint = focalPoint
+            )
         )
 
         val expectedStates = listOf(
-            initState.copy(locations = locations, usersLocation = null, errorMessage = null, focusOn = focalPoint)
+            initState.copy(
+                locations = locations,
+                usersLocation = null,
+                errorMessage = null,
+                focusOn = focalPoint
+            )
         )
 
         val actualStates = mutableListOf<LocationsState>()
@@ -234,6 +242,54 @@ class LocationsViewModelTest {
 
         val expectedStates = listOf(
             initState.copy(errorMessage = errorMessage)
+        )
+
+        val actualStates = mutableListOf<LocationsState>()
+        with(viewModel) {
+            results.forEach {
+                actualStates.add(initState + it)
+            }
+        }
+
+        assertThat(actualStates).isEqualTo(expectedStates)
+    }
+
+    @Test
+    fun plus_merges_adds_searching_state() {
+        val errorMessage = "Invalid Search"
+        val viewModel = createViewModel(invalidSearchCriteriaErrorMessage = errorMessage)
+        val initState = viewModel.makeInitState()
+        val results = listOf(
+            CampGladiatorLocationsUseCase.Results.LocationsLoading
+        )
+
+        val expectedStates = listOf(
+            initState.copy(isSearching = true)
+        )
+
+        val actualStates = mutableListOf<LocationsState>()
+        with(viewModel) {
+            results.forEach {
+                actualStates.add(initState + it)
+            }
+        }
+
+        assertThat(actualStates).isEqualTo(expectedStates)
+    }
+
+    @Test
+    fun plus_merges_removes_searching_state() {
+        val errorMessage = "Invalid Search"
+        val viewModel = createViewModel(invalidSearchCriteriaErrorMessage = errorMessage)
+        val initState = viewModel.makeInitState().copy(isSearching = true)
+        val results = listOf(
+            CampGladiatorLocationsUseCase.Results.LocationCouldNotBeFound,
+            CampGladiatorLocationsUseCase.Results.LocationsGathered(emptyList())
+        )
+
+        val expectedStates = listOf(
+            initState.copy(isSearching = false, errorMessage = errorMessage),
+            initState.copy(isSearching = false, locations = emptyList())
         )
 
         val actualStates = mutableListOf<LocationsState>()
