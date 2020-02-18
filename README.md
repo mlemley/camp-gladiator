@@ -40,10 +40,6 @@ Note: If the following exception is reported in `Logcat` perform the following
 1) Navigate to your Map API Key
 2) Edit the credentials in app to restrict usage to your application Add the fingerprint for the certificate as well as the package name of the application
 
-### Test Frameworks Employed
-* [Robolectric.org](https://robolectric.org) for integration / unit tests that touch the android framework
-* [mockk](https://mockk.io/) for plain unit testing (Native Kotlin mocking DSL)
-
 ### Gradle Configuration
 
 ### Local Build
@@ -70,7 +66,20 @@ Developers can build on the command line with the appropriate android environmen
 Artifacts will be located at `$project.dir`/app/build/outputs/debug/`**`.apk
 
 
-## CI
+## CI / CD
 
 Continuous Integration is brought to you by [Travis CI](https://travis-ci.org/mlemley/camp-gladiator)
+
+
+## System Architecture
+
+Implementing MVVM
+
+![](./docs/mvvm.png)
+
+## Tooling
+
+### Test Frameworks Employed
+* [Robolectric.org](https://robolectric.org) for integration / unit tests that touch the android framework
+* [mockk](https://mockk.io/) for plain unit testing (Native Kotlin mocking DSL)
 
