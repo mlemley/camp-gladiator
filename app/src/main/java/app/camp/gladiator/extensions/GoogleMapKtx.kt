@@ -9,7 +9,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 
 fun GoogleMap.moveCameraTo(latLng: LatLng, zoomLevel: Float = 12F) =
-    this.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel))
+    this.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel))
 
 fun GoogleMap.clearPins() = this.clear()
 
