@@ -2,6 +2,7 @@ package app.camp.gladiator.ui.locations
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,8 @@ import app.camp.gladiator.extensions.app.toLatLng
 import app.camp.gladiator.extensions.exhaustive
 import app.camp.gladiator.repository.Permission
 import app.camp.gladiator.ui.base.BaseFragment
+import app.camp.gladiator.ui.locations.LocationsViewModel.PermissionCollectionState
+import app.camp.gladiator.ui.locations.LocationsViewModel.SearchProgressState
 import app.lemley.crypscape.extensions.app.withView
 import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,55 +48,60 @@ class LocationsFragment : BaseFragment() {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val stateObserver: Observer<LocationsViewModel.LocationsState> = Observer { state ->
-        when {
-            state.requiredPermission != null -> requestPermissionsFor(
-                state.requiredPermission,
-                state.permissionRationale
-            )
-            else -> {
-                mapFragment?.let { fragment ->
-                    mapController.performMapOperation(
-                        fragment,
-                        MapOperations.EnableLocationRendering
-                    )
-                    state.usersLocation?.let { location ->
-                        mapController.performMapOperation(
-                            fragment,
-                            MapOperations.CenterOn(location.toLatLng())
-                        )
-                    }
+        with(state) {
+            when {
+                shouldRequestPermission() -> requestPermissionsFor(
+                    permissionState.requiredPermission,
+                    permissionState.permissionRationale
+                )
+                searchCriteriaState.searchProgressState == SearchProgressState.Idle
+                        && searchCriteriaState.locations.isEmpty()
+                        && searchCriteriaState.focusOn == null
+                        && usersLocation != null -> locationsViewModel.dispatchEvent(
+                    LocationsViewModel.Events.GatherLocationsNearMe
+                )
+                else -> {
                 }
             }
-        }
 
-        when {
-            state.locations.isNotEmpty() -> mapFragment?.let {
-                mapController.performMapOperation(
-                    it,
-                    MapOperations.PlotLocations(state.locations)
-                )
-            }
-            state.locations.isEmpty() && state.focusOn != null -> {}
-            else -> locationsViewModel.dispatchEvent(LocationsViewModel.Events.GatherLocationsNearMe)
-        }
-
-        state.errorMessage?.let { showMessage(it) }
-        state.focusOn?.let { focalPoint ->
-            mapFragment?.let {
-                mapController.performMapOperation(
-                    it,
-                    MapOperations.CenterOn(focalPoint.toLatLng())
-                )
+            when {
+                usersLocation != null -> performMapOperation(MapOperations.EnableLocationRendering)
+                else -> {
+                }
             }
 
-            focusOffOfSearch()
-        }
+            when {
+                searchCriteriaState.focusOn != null ->
+                    performMapOperation(MapOperations.CenterOn(searchCriteriaState.focusOn.toLatLng()))
+                usersLocation != null ->
+                    performMapOperation(MapOperations.CenterOn(usersLocation.toLatLng()))
+                else -> {
+                }
+            }
 
-        when (state.isSearching) {
-            true -> searchProgressIndicator?.show()
-            false -> searchProgressIndicator?.gone()
-        }.exhaustive
+            when (searchCriteriaState.searchProgressState) {
+                SearchProgressState.Idle -> {
+                    searchProgressIndicator?.gone()
+                    performMapOperation(MapOperations.PlotLocations(searchCriteriaState.locations))
+                }
+                SearchProgressState.Searching -> {
+                    searchProgressIndicator?.show()
+                }
+            }.exhaustive
+
+            if (errorMessage != null ) showMessage(errorMessage)
+        }
     }
+
+    private fun performMapOperation(operation: MapOperations) {
+        mapFragment?.let { fragment ->
+            mapController.performMapOperation(fragment, operation)
+        }
+    }
+
+    private fun LocationsViewModel.LocationsState.shouldRequestPermission() =
+        (permissionState.permissionCollectionState == PermissionCollectionState.Init
+                && permissionState.requiredPermission != null)
 
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -144,21 +152,35 @@ class LocationsFragment : BaseFragment() {
     }
 
     // TODO: pull up into base class when permissions count are > 1
-    private fun requestPermissionsFor(permission: Permission, rationale: String) =
-        if (shouldShowRequestPermissionRationale(permission.name)) {
-            context?.let {
-                val dialog = AlertDialog.Builder(it)
-                    .setMessage(rationale)
-                    .setPositiveButton(getString(R.string.enable)) { dialogInterface: DialogInterface, i: Int ->
-                        requestPermissions(arrayOf(permission.name), permissionRequestCode)
-                        dialogInterface.dismiss()
-                    }
-                    .setNegativeButton(getString(R.string.keep_disabled)) { dialogInterface: DialogInterface, i: Int -> dialogInterface.dismiss() }
-                    .show()
+    private fun requestPermissionsFor(permission: Permission?, rationale: String) {
+        permission?.let {
+            if (shouldShowRequestPermissionRationale(permission.name)) {
+                context?.let {
+                    AlertDialog.Builder(it)
+                        .setMessage(rationale)
+                        .setCancelable(false)
+                        .setPositiveButton(getString(R.string.enable)) { dialogInterface: DialogInterface, i: Int ->
+                            requestPermissions(arrayOf(permission.name), permissionRequestCode)
+                            dialogInterface.dismiss()
+                        }
+                        .setNegativeButton(getString(R.string.keep_disabled)) { dialogInterface: DialogInterface, i: Int ->
+                            LocationsViewModel.Events.PermissionsResponse(
+                                mapOf(Pair(permission.name, PackageManager.PERMISSION_DENIED))
+                            )
+                            dialogInterface.dismiss()
+                        }
+                        .show()
+                }
+            } else {
+                requestPermissions(arrayOf(permission.name), permissionRequestCode)
+                locationsViewModel.dispatchEvent(
+                    LocationsViewModel.Events.PermissionRequested(
+                        permission
+                    )
+                )
             }
-        } else {
-            requestPermissions(arrayOf(permission.name), permissionRequestCode)
         }
+    }
 
     private fun focusOffOfSearch() = searchView?.clearFocus()
 

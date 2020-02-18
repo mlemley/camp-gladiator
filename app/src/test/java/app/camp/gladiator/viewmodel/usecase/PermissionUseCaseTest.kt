@@ -3,6 +3,7 @@ package app.camp.gladiator.viewmodel.usecase
 import android.content.pm.PackageManager
 import app.camp.gladiator.repository.Permission
 import app.camp.gladiator.viewmodel.Action
+import app.camp.gladiator.viewmodel.usecase.PermissionUseCase.Actions
 import app.camp.gladiator.viewmodel.usecase.PermissionUseCase.Results
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,8 +19,23 @@ class PermissionUseCaseTest {
     @Test
     fun can_handle_actions() {
         val useCase = createUseCase()
-        assertThat(useCase.canProcess(PermissionUseCase.PermissionResponseReceived(emptyMap()))).isTrue()
+        assertThat(useCase.canProcess(Actions.PermissionResponseReceived(emptyMap()))).isTrue()
         assertThat(useCase.canProcess(object : Action {})).isFalse()
+    }
+
+    @Test
+    fun handle_action__permission_requested() {
+        var actualResult: Results.PermissionRequestAcknowledged? = null
+
+        runBlocking {
+            createUseCase().handleAction(
+                Actions.PermissionRequested(Permission.LocationPermission)
+            ).collect { result ->
+                actualResult = result as Results.PermissionRequestAcknowledged
+            }
+        }
+
+        assertThat(actualResult).isEqualTo(Results.PermissionRequestAcknowledged(Permission.LocationPermission))
     }
 
     @Test
@@ -28,7 +44,7 @@ class PermissionUseCaseTest {
 
         runBlocking {
             createUseCase().handleAction(
-                PermissionUseCase.PermissionResponseReceived(
+                Actions.PermissionResponseReceived(
                     mapOf(
                         Pair(Permission.LocationPermission.name, PackageManager.PERMISSION_GRANTED)
                     )
@@ -47,7 +63,7 @@ class PermissionUseCaseTest {
 
         runBlocking {
             createUseCase().handleAction(
-                PermissionUseCase.PermissionResponseReceived(
+                Actions.PermissionResponseReceived(
                     mapOf(
                         Pair(Permission.LocationPermission.name, PackageManager.PERMISSION_DENIED)
                     )

@@ -1,6 +1,5 @@
 package app.camp.gladiator.ui.locations
 
-import android.location.Location
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -9,15 +8,13 @@ import androidx.lifecycle.LiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.camp.gladiator.app.Helpers.loadModules
 import app.camp.gladiator.app.Helpers.themeId
-import com.google.android.gms.maps.model.LatLng
+import app.camp.gladiator.ui.locations.LocationsViewModel.*
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
-import io.mockk.excludeRecords
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.android.viewmodel.dsl.viewModel
@@ -30,7 +27,7 @@ import org.robolectric.shadows.ShadowAlertDialog
 class LocationsFragmentTest {
 
     private fun createScenario(
-        liveDataState: LiveData<LocationsViewModel.LocationsState> = mockk(relaxUnitFun = true),
+        liveDataState: LiveData<LocationsState> = mockk(relaxUnitFun = true),
         locationsViewModel: LocationsViewModel = mockk(relaxed = true) {
             every { state } returns liveDataState
         },
@@ -53,7 +50,7 @@ class LocationsFragmentTest {
 
     @Test
     fun observes_state_change__when_created() {
-        val state: LiveData<LocationsViewModel.LocationsState> = mockk(relaxUnitFun = true)
+        val state: LiveData<LocationsState> = mockk(relaxUnitFun = true)
 
         createScenario(state).onFragment { fragment ->
             verify {
@@ -63,13 +60,27 @@ class LocationsFragmentTest {
     }
 
     @Test
-    fun dispatches_init_event_when_loaded() {
+    fun gather_locations_near_user_when_permission_collected__and_user_location_present() {
         val viewModel: LocationsViewModel = mockk(relaxUnitFun = true) {
             every { state } returns mockk(relaxUnitFun = true)
         }
         createScenario(locationsViewModel = viewModel).onFragment { fragment ->
             fragment.stateObserver.onChanged(
-                LocationsViewModel.LocationsState()
+                LocationsState(
+                    permissionState = PermissionState(
+                        requiredPermission = null,
+                        permissionCollectionState = PermissionCollectionState.Collected
+                    ),
+                    usersLocation = mockk {
+                        every { latitude } returns 30.406991
+                        every { longitude } returns -97.720310
+                    },
+                    searchCriteriaState = SearchCriteriaState(
+                        locations = emptyList(),
+                        searchProgressState = SearchProgressState.Idle,
+                        focusOn = null
+                    )
+                )
             )
 
             verify {
@@ -77,7 +88,6 @@ class LocationsFragmentTest {
             }
         }
     }
-
 
     @Test
     fun sets_search_query_observer_on_search_view() {
@@ -98,7 +108,7 @@ class LocationsFragmentTest {
     fun shows_error_message_when_instructed() {
         val errorMessage = "Some error to show"
         createScenario().onFragment { fragment ->
-            fragment.stateObserver.onChanged(LocationsViewModel.LocationsState(errorMessage = errorMessage))
+            fragment.stateObserver.onChanged(LocationsState(errorMessage = errorMessage))
 
             val error = ShadowAlertDialog.getLatestDialog()
             assertThat(error).isNotNull()
@@ -108,40 +118,31 @@ class LocationsFragmentTest {
         }
     }
 
-    @Ignore
-    @Test
-    fun centers_map_on_focal_point() {
-        val mapController = mockk<MapController>(relaxUnitFun = true)
-        val focalPoint = LatLng(30.406991, -97.720310)
-        val location = mockk<Location>(relaxUnitFun = true) {
-            every { latitude } returns focalPoint.latitude
-            every { longitude } returns focalPoint.longitude
-        }
-        createScenario(mapController = mapController).onFragment { fragment ->
-            fragment.stateObserver.onChanged(LocationsViewModel.LocationsState(focusOn = location))
-
-            excludeRecords {
-                mapController.performMapOperation(any(), eq(MapOperations.EnableLocationRendering))
-            }
-
-            verify {
-                mapController.performMapOperation(any(), MapOperations.CenterOn(focalPoint))
-            }
-        }
-    }
-
     @Test
     fun renders_searching_loader_when_searching() {
         createScenario().onFragment { fragment ->
-            val initialState = LocationsViewModel.LocationsState()
+            val initialState = LocationsState()
 
             fragment.stateObserver.onChanged(initialState)
             assertThat(fragment.searchProgressIndicator?.visibility).isEqualTo(View.GONE)
 
-            fragment.stateObserver.onChanged(initialState.copy(isSearching = true))
+            fragment.stateObserver.onChanged(
+                initialState.copy(
+                    searchCriteriaState = initialState.searchCriteriaState.copy(
+                        searchProgressState = SearchProgressState.Searching
+                    )
+                )
+            )
             assertThat(fragment.searchProgressIndicator?.visibility).isEqualTo(View.VISIBLE)
 
-            fragment.stateObserver.onChanged(initialState.copy(isSearching = false))
+
+            fragment.stateObserver.onChanged(
+                initialState.copy(
+                    searchCriteriaState = initialState.searchCriteriaState.copy(
+                        searchProgressState = SearchProgressState.Idle
+                    )
+                )
+            )
             assertThat(fragment.searchProgressIndicator?.visibility).isEqualTo(View.GONE)
         }
     }

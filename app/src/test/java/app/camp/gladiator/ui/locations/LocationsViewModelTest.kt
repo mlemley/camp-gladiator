@@ -6,7 +6,7 @@ import app.camp.gladiator.client.cg.model.TrainingLocation
 import app.camp.gladiator.repository.LocationRepository
 import app.camp.gladiator.repository.Permission
 import app.camp.gladiator.repository.PermissionRepository
-import app.camp.gladiator.ui.locations.LocationsViewModel.LocationsState
+import app.camp.gladiator.ui.locations.LocationsViewModel.*
 import app.camp.gladiator.viewmodel.Action
 import app.camp.gladiator.viewmodel.usecase.CampGladiatorLocationsUseCase
 import app.camp.gladiator.viewmodel.usecase.PermissionUseCase
@@ -76,8 +76,10 @@ class LocationsViewModelTest {
             ).makeInitState()
         ).isEqualTo(
             LocationsState(
-                requiredPermission = Permission.LocationPermission,
-                permissionRationale = permissionRationale
+                permissionState = PermissionState(
+                    requiredPermission = Permission.LocationPermission,
+                    permissionRationale = permissionRationale
+                )
             )
         )
     }
@@ -99,7 +101,11 @@ class LocationsViewModelTest {
             ).makeInitState()
         ).isEqualTo(
             LocationsState(
-                permissionRationale = permissionRationale,
+                permissionState = PermissionState(
+                    requiredPermission = null,
+                    permissionCollectionState = PermissionCollectionState.Collected,
+                    permissionRationale = permissionRationale
+                ),
                 usersLocation = usersLocation
             )
         )
@@ -118,13 +124,15 @@ class LocationsViewModelTest {
         val events = flowOf(
             LocationsViewModel.Events.GatherLocationsNearMe,
             LocationsViewModel.Events.LocationSearchNear(searchCriteria),
+            LocationsViewModel.Events.PermissionRequested(Permission.LocationPermission),
             LocationsViewModel.Events.PermissionsResponse(permissions)
         )
 
         val expected = listOf(
             CampGladiatorLocationsUseCase.Actions.GatherLocationsNearMe,
             CampGladiatorLocationsUseCase.Actions.GatherLocationsNearSearchCriteria(searchCriteria),
-            PermissionUseCase.PermissionResponseReceived(permissions)
+            PermissionUseCase.Actions.PermissionRequested(Permission.LocationPermission),
+            PermissionUseCase.Actions.PermissionResponseReceived(permissions)
         )
 
         val actual = mutableListOf<Action>()
@@ -146,13 +154,33 @@ class LocationsViewModelTest {
         val viewModel = createViewModel(permissionRepository = permissionRepository)
         val initState = viewModel.makeInitState()
         val results = listOf(
+            PermissionUseCase.Results.PermissionRequestAcknowledged(Permission.LocationPermission),
             PermissionUseCase.Results.LocationPermissionDenied,
             PermissionUseCase.Results.LocationPermissionGranted
         )
 
         val expectedStates = listOf(
-            initState.copy(requiredPermission = Permission.LocationPermission, permissionCollected = true),
-            initState.copy(requiredPermission = null, permissionCollected = true)
+            initState.copy(
+                permissionState = PermissionState(
+                    requiredPermission = Permission.LocationPermission,
+                    permissionRationale = permissionRationale,
+                    permissionCollectionState = PermissionCollectionState.Requested
+                )
+            ),
+            initState.copy(
+                permissionState = PermissionState(
+                    requiredPermission = Permission.LocationPermission,
+                    permissionRationale = permissionRationale,
+                    permissionCollectionState = PermissionCollectionState.Collected
+                )
+            ),
+            initState.copy(
+                permissionState = PermissionState(
+                    requiredPermission = null,
+                    permissionRationale = permissionRationale,
+                    permissionCollectionState = PermissionCollectionState.Collected
+                )
+            )
         )
 
         val actualStates = mutableListOf<LocationsState>()
@@ -182,10 +210,12 @@ class LocationsViewModelTest {
 
         val expectedStates = listOf(
             initState.copy(
-                locations = locations,
+                searchCriteriaState = SearchCriteriaState(
+                    locations = locations,
+                    focusOn = usersLocation
+                ),
                 usersLocation = usersLocation,
-                errorMessage = null,
-                focusOn = usersLocation
+                errorMessage = null
             )
         )
 
@@ -215,10 +245,12 @@ class LocationsViewModelTest {
 
         val expectedStates = listOf(
             initState.copy(
-                locations = locations,
+                searchCriteriaState = SearchCriteriaState(
+                    locations = locations,
+                    focusOn = focalPoint
+                ),
                 usersLocation = null,
-                errorMessage = null,
-                focusOn = focalPoint
+                errorMessage = null
             )
         )
 
@@ -265,7 +297,11 @@ class LocationsViewModelTest {
         )
 
         val expectedStates = listOf(
-            initState.copy(isSearching = true)
+            initState.copy(
+                searchCriteriaState = initState.searchCriteriaState.copy(
+                    searchProgressState = SearchProgressState.Searching
+                )
+            )
         )
 
         val actualStates = mutableListOf<LocationsState>()
@@ -282,18 +318,29 @@ class LocationsViewModelTest {
     fun plus_merges_removes_searching_state() {
         val errorMessage = "Invalid Search"
         val viewModel = createViewModel(invalidSearchCriteriaErrorMessage = errorMessage)
-        val initState = viewModel.makeInitState().copy(isSearching = true)
+        val initState = viewModel.makeInitState().copy(
+            searchCriteriaState = SearchCriteriaState(searchProgressState = SearchProgressState.Searching)
+        )
         val results = listOf(
             CampGladiatorLocationsUseCase.Results.LocationCouldNotBeFound,
             CampGladiatorLocationsUseCase.Results.LocationsGathered(emptyList())
         )
 
         val expectedStates = listOf(
-            initState.copy(isSearching = false, errorMessage = errorMessage),
-            initState.copy(isSearching = false, locations = emptyList())
+            initState.copy(
+                searchCriteriaState = initState.searchCriteriaState.copy(
+                    searchProgressState = SearchProgressState.Idle
+                ), errorMessage = errorMessage
+            ),
+            initState.copy(
+                searchCriteriaState = initState.searchCriteriaState.copy(
+                    searchProgressState = SearchProgressState.Idle,
+                    locations = emptyList()
+                )
+            )
         )
 
-        val actualStates = mutableListOf<LocationsState>()
+        val actualStates = mutableListOf < LocationsState >()
         with(viewModel) {
             results.forEach {
                 actualStates.add(initState + it)

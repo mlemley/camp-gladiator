@@ -31,26 +31,50 @@ class LocationsViewModel(
         object GatherLocationsNearMe : Events()
         data class PermissionsResponse(val permissions: Map<String, Int>) : Events()
         data class LocationSearchNear(val searchCriteria: String) : Events()
+        data class PermissionRequested(val permission: Permission) : LocationsViewModel.Events()
     }
 
-    data class LocationsState(
-        val requiredPermission: Permission? = null,
-        val permissionCollected: Boolean = false,
-        val permissionRationale: String = "",
+    sealed class PermissionCollectionState {
+        object Init : PermissionCollectionState()
+        object Requested : PermissionCollectionState()
+        object Collected : PermissionCollectionState()
+    }
+
+    data class PermissionState(
+        val requiredPermission: Permission? = Permission.LocationPermission,
+        val permissionCollectionState: PermissionCollectionState = PermissionCollectionState.Init,
+        val permissionRationale: String = ""
+    )
+
+    sealed class SearchProgressState {
+        object Idle : SearchProgressState()
+        object Searching : SearchProgressState()
+    }
+
+    data class SearchCriteriaState(
         val locations: List<TrainingLocation> = emptyList(),
+        val searchProgressState: SearchProgressState = SearchProgressState.Idle,
+        val focusOn: Location? = null
+    )
+
+    data class LocationsState(
+        val permissionState: PermissionState = PermissionState(),
+        val searchCriteriaState: SearchCriteriaState = SearchCriteriaState(),
         val usersLocation: Location? = null,
-        val errorMessage: String? = null,
-        val focusOn: Location? = null,
-        val isSearching: Boolean = false
+        val errorMessage: String? = null
     ) : State
 
     override val useCases: List<UseCase> = listOf(permissionUseCase, campGladiatorLocationsUseCase)
 
     override fun makeInitState(): LocationsState = runBlocking {
         val usersLocation = locationRepository.lastKnownLocation()
+        val requiredPermission = requiredPermission()
         LocationsState(
-            requiredPermission = requiredPermission(),
-            permissionRationale = permissionRationale,
+            permissionState = PermissionState(
+                requiredPermission = requiredPermission,
+                permissionRationale = permissionRationale,
+                permissionCollectionState = if (requiredPermission == null) PermissionCollectionState.Collected else PermissionCollectionState.Init
+            ),
             usersLocation = if (usersLocation.latitude == 0.0 || usersLocation.longitude == 0.0) null else usersLocation
         )
     }
@@ -58,11 +82,15 @@ class LocationsViewModel(
     override fun Flow<Events>.eventTransform(): Flow<Action> = flow {
         collect {
             when (it) {
+                is Events.PermissionRequested -> emit(
+                    PermissionUseCase.Actions.PermissionRequested(
+                        it.permission
+                    )
+                )
+
                 is Events.GatherLocationsNearMe -> emit(CampGladiatorLocationsUseCase.Actions.GatherLocationsNearMe)
                 is Events.PermissionsResponse -> emit(
-                    PermissionUseCase.PermissionResponseReceived(
-                        it.permissions
-                    )
+                    PermissionUseCase.Actions.PermissionResponseReceived(it.permissions)
                 )
                 is Events.LocationSearchNear -> emit(
                     CampGladiatorLocationsUseCase.Actions.GatherLocationsNearSearchCriteria(
@@ -75,31 +103,43 @@ class LocationsViewModel(
 
     override fun LocationsState.plus(result: Result): LocationsState {
         return when (result) {
-            is PermissionUseCase.Results.LocationPermissionGranted -> copy(
-                requiredPermission = null,
-                errorMessage = null,
-                isSearching = false,
-                permissionCollected = true
+            is PermissionUseCase.Results.PermissionRequestAcknowledged -> copy(
+                this.permissionState.copy(
+                    permissionCollectionState = PermissionCollectionState.Requested
+                )
             )
-
+            is PermissionUseCase.Results.LocationPermissionGranted -> copy(
+                this.permissionState.copy(
+                    requiredPermission = null,
+                    permissionCollectionState = PermissionCollectionState.Collected
+                )
+            )
             is PermissionUseCase.Results.LocationPermissionDenied -> copy(
-                permissionCollected = true
+                this.permissionState.copy(
+                    permissionCollectionState = PermissionCollectionState.Collected
+                )
             )
             is CampGladiatorLocationsUseCase.Results.LocationsGathered -> copy(
-                locations = result.locations,
+                searchCriteriaState = this.searchCriteriaState.copy(
+                    locations = result.locations,
+                    focusOn = result.focalPoint,
+                    searchProgressState = SearchProgressState.Idle
+                ),
                 usersLocation = result.usersLocation,
-                focusOn = result.focalPoint,
-                errorMessage = null,
-                isSearching = false
+                errorMessage = null
             )
             is CampGladiatorLocationsUseCase.Results.LocationCouldNotBeFound -> copy(
-                errorMessage = invalidSearchCriteriaErrorMessage,
-                isSearching = false
+                searchCriteriaState = this.searchCriteriaState.copy(
+                    searchProgressState = SearchProgressState.Idle
+                ),
+                errorMessage = invalidSearchCriteriaErrorMessage
             )
             is CampGladiatorLocationsUseCase.Results.LocationsLoading -> copy(
-                isSearching = true
+                searchCriteriaState = this.searchCriteriaState.copy(
+                    searchProgressState = SearchProgressState.Searching
+                )
             )
-            else -> this.copy(errorMessage = null, isSearching = false)
+            else -> this.copy(errorMessage = null)
         }
     }
 
