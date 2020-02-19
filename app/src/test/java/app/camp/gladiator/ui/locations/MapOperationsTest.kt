@@ -8,6 +8,7 @@ import app.camp.gladiator.extensions.clearPins
 import app.camp.gladiator.extensions.moveCameraTo
 import app.camp.gladiator.extensions.plot
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.UiSettings
 import com.google.android.gms.maps.model.LatLng
 import io.mockk.every
 import io.mockk.mockk
@@ -22,12 +23,17 @@ class MapOperationsTest {
 
     @Test
     fun enable_location_rendering() {
-        val map = mockk<GoogleMap>(relaxUnitFun = true)
+        val settings:UiSettings = mockk(relaxUnitFun = true)
+        val map = mockk<GoogleMap>(relaxUnitFun = true) {
+            every { uiSettings } returns settings
+        }
+
 
         MapOperations.EnableLocationRendering.operateWith(map)
 
         verify {
             map.isMyLocationEnabled = true
+            settings.isMyLocationButtonEnabled = false
         }
     }
 
