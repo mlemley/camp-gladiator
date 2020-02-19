@@ -1,8 +1,6 @@
 package app.camp.gladiator.ui.locations
 
-import android.location.Location
 import app.camp.gladiator.client.cg.model.TrainingLocation
-import app.camp.gladiator.extensions.app.toLatLng
 import app.camp.gladiator.extensions.clearPins
 import app.camp.gladiator.extensions.moveCameraTo
 import app.camp.gladiator.extensions.plot
@@ -18,6 +16,7 @@ sealed class MapOperations : MapOperation {
     object EnableLocationRendering : MapOperations() {
         override fun operateWith(map: GoogleMap) {
             map.isMyLocationEnabled = true
+            map.uiSettings.isMyLocationButtonEnabled = false
         }
     }
 
@@ -36,7 +35,8 @@ sealed class MapOperations : MapOperation {
         }
     }
 
-    class ObserveCameraMove(val onCameraMoveListener:GoogleMap.OnCameraMoveListener):MapOperations() {
+    class ObserveCameraMove(val onCameraMoveListener: GoogleMap.OnCameraMoveListener) :
+        MapOperations() {
         override fun operateWith(map: GoogleMap) {
             map.setOnCameraMoveListener(onCameraMoveListener)
         }

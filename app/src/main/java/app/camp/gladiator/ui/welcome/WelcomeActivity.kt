@@ -10,12 +10,13 @@ import app.camp.gladiator.ui.welcome.WelcomeScreenViewModel.RequiredActions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 class WelcomeActivity : AppCompatActivity() {
 
-    val welcomeViewModel: WelcomeScreenViewModel by inject()
+    val welcomeViewModel: WelcomeScreenViewModel by viewModel()
 
     val stateObserver: Observer<WelcomeScreenViewModel.WelcomeScreenState> = Observer { state ->
         when (state.requiredActions) {

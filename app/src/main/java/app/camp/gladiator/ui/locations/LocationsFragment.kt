@@ -26,13 +26,14 @@ import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 class LocationsFragment : BaseFragment() {
 
-    private val locationsViewModel: LocationsViewModel by inject()
+    private val locationsViewModel: LocationsViewModel by viewModel()
     private val mapController: MapController by inject()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
