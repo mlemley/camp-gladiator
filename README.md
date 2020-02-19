@@ -63,7 +63,7 @@ Developers can build on the command line with the appropriate android environmen
 
 ```
 
-Artifacts will be located at `$project.dir`/app/build/outputs/debug/`**`.apk
+Artifacts will be located at `$project.dir`/app/build/outputs/apk/debug/`**`.apk
 
 
 ## CI / CD
